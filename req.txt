@@ -1,0 +1,6 @@
+transformers
+langgraph
+langchain-huggingface
+huggingface_hub
+torchvision 
+torchaudio
