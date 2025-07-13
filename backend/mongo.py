@@ -16,6 +16,6 @@ def get_db_handle(db_name, host, port, username, password):
                       username=username,
                       password=password
                      )
-    db_handle = client['db_name']
+    db_handle = client['interview_db']
     
     return db_handle, client

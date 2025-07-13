@@ -9,3 +9,4 @@ class QAPair(models.Model):
 
     # def __str__(self):
     #     return f"Q: {self.question} | A: {self.answer}"
+
