@@ -25,7 +25,9 @@ def main():
     graph= build_graph()
     
     result = graph.invoke(inputs)
-
+    print("===For Debuggig===")
+    print(result)
+    print("====================")
     print("\nGenerated Questions:\n")
     for i, qa in enumerate(result["question_answer_pairs"], start=1):
         print(f"{i}. {qa['question']}")

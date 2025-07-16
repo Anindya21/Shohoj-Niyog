@@ -7,6 +7,10 @@ import sys
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+    
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))  # project root
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

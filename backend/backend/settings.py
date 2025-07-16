@@ -11,16 +11,31 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+import environ
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+env = environ.Env()
+environ.Env.read_env()
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!-kh#g((rib)b^)51%g=vn3x6@*$ryvurr9aqcb^r8z@!0e2!#'
+
+
+SECRET_KEY = env("SECRET_KEY")
+
+DEBUG = "True"
+
+ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+
+# Example: Mongo or Postgres config (optional)
+# MONGO_USER = env("mongo_user")
+# MONGO_PASS = env("mongo_pass")
+# MONGO_HOST = os.getenv("host")
+# MONGO_PORT = os.getenv("port")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
