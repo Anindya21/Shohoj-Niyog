@@ -1,0 +1,16 @@
+// {
+// 	{
+// 		"question":"What is the purpose of the `get_db_handle` function in the `backend/mongo.py` file?",
+// 		"answer":"The `get_db_handle` function in the `backend/mongo.py` file is used to establish a connection to a MongoDB database. It takes the database name, username, and password as parameters, creates a MongoDB client, and returns the database handle along with the client object for further operations."
+// 	},
+// 	{
+// 		"question":"What is the purpose of the `get_db_handle` function in the `backend/mongo.py` file?",
+// 		"answer":"The `get_db_handle` function in the `backend/mongo.py` file is used to establish a connection to a MongoDB database. It takes the database name, username, and password as parameters, creates a MongoDB client, and returns the database handle along with the client object for further operations."
+// 	}
+// }
+
+{
+    "role":"Data Scientist",
+    "stack":"Pandas, NumPy, Scikit-learn",
+    "level":"Intermediate"
+}
