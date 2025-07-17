@@ -26,6 +26,7 @@ def generate_question_and_answer_node(state: GraphState) -> GraphState:
     else:
         raise ValueError("All attempts failed to produce valid JSON.")
 
+    
     return {
         **state,
         "question_answer_pairs": qa_pairs

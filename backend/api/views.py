@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from base.models import QAPair
-from .serializers import MongoQuestionSerializer
+from .serializers import MongoQuestionPullSerializer
 from .mongo import get_db_handle
 from graph.builder import build_graph
 from utils.env_loader import load_env
@@ -9,15 +9,6 @@ import os
 import time
 
 load_env()
-
-@api_view(['POST'])
-def add_qa_pair(request):
-    serializer = QAPairSerializer(data= request.data)
-    
-    if serializer.is_valid():
-        serializer.save()
-        
-    return Response(serializer.data)
 
 @api_view(["POST"])
 def get_role_stacks_levels(request):
@@ -58,11 +49,15 @@ def get_role_stacks_levels(request):
 
     collection = db['qa_pairs']
 
+    qa_pairs = []
+    
     for qa in result["question_answer_pairs"]:
         question = qa['question']
         answer = qa['answer']
-        collection.insert_one({"role": role,"stack":stacks, "level":level ,"question": question, "answer": answer})    
-    
+        qa_pairs.append({'question': question, 'answer': answer})
+
+    collection.insert_one({"role": role,"stack":stacks, "level":level ,'qa_pairs': qa_pairs})    
+        
     # t5 = time.time()
     # timing['Data Insertion Time into Database'] = t5 - t4
     # print("Timing:", timing)
@@ -76,24 +71,26 @@ def get_question(request):
     # if not role:
     #     return Response({"error": "Role parameter is required."}, status=400)
     
-    
     db, _ = get_db_handle("interview_db")
     collection = db['qa_pairs']
 
     # doc= collection.find_one({'role': role})
-    docs= collection.find()
+    docs= list(collection.find())
     # if not doc:
     #     return Response({"error": "No question found for the specified role."}, status=404)
     
     # docs['_id'] = str(docs['_id'])
-    serialized_docs = []
+    # serialized_docs = []
     for doc in docs:
         doc['_id'] = str(doc['_id'])
-        serialized_docs.append(doc)
+        # serialized_docs.append(doc)
     
-    serializer = MongoQuestionSerializer(serialized_docs, many=True)
+    serializer = MongoQuestionPullSerializer(docs, many=True)
     
     return Response(serializer.data)
+
+# @api_view(['GET'])
+# def get_answer(request):
 
 
 
