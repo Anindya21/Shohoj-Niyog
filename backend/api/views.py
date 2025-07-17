@@ -70,25 +70,30 @@ def get_role_stacks_levels(request):
 
 @api_view(['GET'])
 def get_question(request):
-    role= request.GET.get('role')
+    # role= request.GET.get('role')
     uri = os.getenv("mongo_uri")
     
-    if not role:
-        return Response({"error": "Role parameter is required."}, status=400)
+    # if not role:
+    #     return Response({"error": "Role parameter is required."}, status=400)
     
     
     db, _ = get_db_handle("interview_db")
     collection = db['qa_pairs']
 
-    doc= collection.find_one({'role': role})
+    # doc= collection.find_one({'role': role})
+    docs= collection.find()
+    # if not doc:
+    #     return Response({"error": "No question found for the specified role."}, status=404)
     
-    if not doc:
-        return Response({"error": "No question found for the specified role."}, status=404)
+    # docs['_id'] = str(docs['_id'])
+    serialized_docs = []
+    for doc in docs:
+        doc['_id'] = str(doc['_id'])
+        serialized_docs.append(doc)
     
-    doc['_id'] = str(doc['_id'])
-    serializer = MongoQuestionSerializer(doc)
+    serializer = MongoQuestionSerializer(serialized_docs, many=True)
     
-    return Response(doc)
+    return Response(serializer.data)
 
 
 
