@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from base.models import QAPair
-from .serializers import QAPairSerializer
+from .serializers import MongoQuestionSerializer
 from .mongo import get_db_handle
 from graph.builder import build_graph
 from utils.env_loader import load_env
@@ -29,9 +29,9 @@ def get_role_stacks_levels(request):
     if not role or not stacks or not level:
         return Response({"error": "role, stacks, and level are required."}, status=400)
     
-    t0= time.time()
+    # t0= time.time()
     graph= build_graph()
-    t1 = time.time()
+    # t1 = time.time()
     
     # timing['Graph Building'] = t1 - t0
     
@@ -68,4 +68,31 @@ def get_role_stacks_levels(request):
     # print("Timing:", timing)
     return Response({"status": "success", "message": "Questions and answers generated and saved."})
 
-# @api_view(['GET'])
+@api_view(['GET'])
+def get_question(request):
+    role= request.GET.get('role')
+    uri = os.getenv("mongo_uri")
+    
+    if not role:
+        return Response({"error": "Role parameter is required."}, status=400)
+    
+    
+    db, _ = get_db_handle("interview_db")
+    collection = db['qa_pairs']
+
+    doc= collection.find_one({'role': role})
+    
+    if not doc:
+        return Response({"error": "No question found for the specified role."}, status=404)
+    
+    doc['_id'] = str(doc['_id'])
+    serializer = MongoQuestionSerializer(doc)
+    
+    return Response(doc)
+
+
+
+
+
+
+

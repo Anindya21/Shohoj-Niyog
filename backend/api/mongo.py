@@ -13,6 +13,5 @@ uri = os.getenv("mongo_uri")
 def get_db_handle(db_name):
     client = MongoClient(uri)
     db_handle = client[db_name]
-    print(f"Connected to MongoDB at {uri} and database {db_name} selected.")
     return db_handle, client
 

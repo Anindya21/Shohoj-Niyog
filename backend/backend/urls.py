@@ -21,5 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', include('api.urls')),  # Include the API URLs
-    path('gen/', include('api.urls')),  # Include the question-answer generation URLs
+    
 ]
