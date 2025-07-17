@@ -1,12 +1,12 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from base.models import QAPair
-from .serializers import MongoQuestionPullSerializer
+from .serializers import MongoQuestionPullSerializer, MongoQuestionSerializer
 from .mongo import get_db_handle
 from graph.builder import build_graph
 from utils.env_loader import load_env
 import os 
-import time
+from bson import ObjectId
 
 load_env()
 
@@ -56,15 +56,17 @@ def get_role_stacks_levels(request):
         answer = qa['answer']
         qa_pairs.append({'question': question, 'answer': answer})
 
-    collection.insert_one({"role": role,"stack":stacks, "level":level ,'qa_pairs': qa_pairs})    
+    inserted_rec= collection.insert_one({"role": role,"stack":stacks, "level":level ,'qa_pairs': qa_pairs})    
         
     # t5 = time.time()
     # timing['Data Insertion Time into Database'] = t5 - t4
     # print("Timing:", timing)
-    return Response({"status": "success", "message": "Questions and answers generated and saved."})
+
+    ID= str(inserted_rec.inserted_id)
+    return Response({"status": "success", "message": "Questions and answers generated and saved.", "Session_ID": f"{ID}"})
 
 @api_view(['GET'])
-def get_question(request):
+def get_allqa(request):
     # role= request.GET.get('role')
     uri = os.getenv("mongo_uri")
     
@@ -89,8 +91,27 @@ def get_question(request):
     
     return Response(serializer.data)
 
-# @api_view(['GET'])
-# def get_answer(request):
+### GET individual interview by session ID
+### in POST I want a session ID in response to be created and returned (Question ID)
+@api_view(['GET'])
+def get_single_question(request, requested_id):
+    uri = os.getenv("mongo_uri")
+    db, _ = get_db_handle("interview_db")
+    collection = db['qa_pairs']
+
+    try:
+        docs= collection.find_one({'_id': ObjectId(requested_id)})
+    except Exception as e:
+        return Response({"error": "Invalid ID format."}, status=400)
+    
+    if not docs:
+        return Response({"error": "Document not found."}, status=404)
+    
+    qa_pairs = docs.get("qa_pairs", [])
+
+    serializer = MongoQuestionSerializer(qa_pairs, many=True)
+
+    return Response(serializer.data)
 
 
 

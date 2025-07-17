@@ -11,3 +11,7 @@ class MongoQuestionPullSerializer(serializers.Serializer):
     stack= serializers.CharField()
     level = serializers.CharField()
     qa_pairs = QAPairSerializer(many=True)
+
+class MongoQuestionSerializer(serializers.Serializer):
+    question = serializers.CharField()
+    
