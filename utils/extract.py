@@ -1,9 +1,9 @@
 import json
 import re
-
+import time
 
 def extract_json_array(text: str) -> list:
-
+    
     # Extract the first JSON-like array from the model output
     match = re.search(r"\[\s*{.*?}\s*\]", text, re.DOTALL)
     if not match:

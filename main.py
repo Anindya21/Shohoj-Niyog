@@ -1,7 +1,9 @@
 import os
 from dotenv import load_dotenv
 from graph.builder import build_graph
+from IPython.display import Image, display
 
+   
 def main():
     print("Welcome to the Question Generator!")
 
@@ -23,7 +25,18 @@ def main():
     }
 
     graph= build_graph()
-    
+    # Get the graph object
+    graph_prnt = graph.get_graph()
+
+   # Option 1: Get a PNG image
+    png = graph_prnt.draw_mermaid_png()
+    display(Image(png))
+
+   # Option 2: Get an ASCII representation
+    ascii_graph = graph_prnt.draw_ascii()
+    print(ascii_graph)
+
+
     result = graph.invoke(inputs)
     print("===For Debuggig===")
     print(result)
