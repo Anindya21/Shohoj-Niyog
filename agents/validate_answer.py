@@ -21,11 +21,10 @@ def validate_answer_node(state: GraphState) -> GraphState:
         ideal_ans.append(each['answer'])
 
     given_ans = state['transcribed_text']
-
+    
     # Now to tokenize the data
-
+    
     tokenized_ideal = [word_tokenize(document.lower()) for document in ideal_ans]
-
     tokenized_given = [word_tokenize(document.lower()) for document in given_ans]
     
     tagged_data = [TaggedDocument(words=words, tags=[str(idx)]) for idx, words in enumerate(tokenized_ideal)]

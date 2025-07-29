@@ -16,7 +16,12 @@ from dotenv import load_dotenv
 import environ
 
 env = environ.Env()
-environ.Env.read_env()
+env_path = Path(__file__).resolve().parent.parent.parent / '.env'
+
+print("Looking for .env at:", env_path)
+
+environ.Env.read_env(env_file=env_path)
+
 
 
 # Quick-start development settings - unsuitable for production
