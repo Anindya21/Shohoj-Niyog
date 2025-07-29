@@ -14,15 +14,15 @@ def main():
     if hf_token is None:
         raise ValueError("HF_TOKEN environment variable is not set. Please set it to your Hugging Face token.")
 
-    role = input("Role: ").strip()
-    stacks = input("Stacks: ").strip()
-    level = input("Level: ").strip()
+    # role = input("Role: ").strip()
+    # stacks = input("Stacks: ").strip()
+    # level = input("Level: ").strip()
 
-    inputs = {
-        "role": role,
-        "stacks": [s.strip() for s in stacks.split(",")],
-        "level": level
-    }
+    # inputs = {
+    #     "role": role,
+    #     "stacks": [s.strip() for s in stacks.split(",")],
+    #     "level": level
+    # }
 
     graph= build_graph()
     # Get the graph object
@@ -37,13 +37,13 @@ def main():
     print(ascii_graph)
 
 
-    result = graph.invoke(inputs)
-    print("===For Debuggig===")
-    print(result)
-    print("====================")
-    print("\nGenerated Questions:\n")
-    for i, qa in enumerate(result["question_answer_pairs"], start=1):
-        print(f"{i}. {qa['question']}")
+    # result = graph.invoke(inputs)
+    # print("===For Debuggig===")
+    # # print(result)
+    # print("====================")
+    # print("\nGenerated Questions:\n") 
+    # for i, qa in enumerate(result["question_answer_pairs"], start=1):
+    #     print(f"{i}. {qa['question']}")
 
 
 if __name__ == "__main__":

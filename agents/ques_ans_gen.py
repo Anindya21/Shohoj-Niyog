@@ -13,8 +13,6 @@ def generate_question_and_answer_node(state: GraphState) -> GraphState:
         f"Level: {state['level']}"
     )
 
-    # print(f"Generating Questions and answers for {state["role"]}, {state["stacks"]}, {state["level"]}...")
-
     for attempt in range(3):
         response = llm.invoke(prompts)
         raw_output = response[0]["generated_text"] if isinstance(response, list) else str(response)
