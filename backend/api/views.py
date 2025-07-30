@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 @api_view(["POST"])
-def get_role_stacks_levels(request):
+def get_role_stacks_levels(request):  # Endpoint to Generate QA And Interview Session
     
     role = request.data.get('role')
     stacks = request.data.get('stacks')
@@ -71,8 +71,39 @@ def get_role_stacks_levels(request):
     ID= str(inserted_rec.inserted_id)
     return Response({"status": "success", "message": "Questions and answers generated and saved.", "Session_ID": f"{ID}"})
 
+
+
+@api_view(['POST'])
+def validate_candidate(request):
+
+    session_id = request.data.get('session_id')
+    email = request.data.get('email')
+
+    if not session_id or not email:
+        return Response({"error": "session_id and email are required."}, status=400)
+    
+    try:
+        uri = os.getenv("mongo_uri")
+        db, _ = get_db_handle("interview_db")
+        collection = db['qa_pairs']
+
+        session_doc = collection.find_one({'_id': ObjectId(session_id)})
+    except:
+        return Response({"error": "Invalid session_id format."}, status=400)
+
+    if not session_doc:
+        return Response({"error": "Session not found."}, status=404) 
+    
+    allowed = session_doc.get('allowed_candidates', [])
+
+    if email not in allowed:
+        return Response({"error": "Candidate not allowed for this session."}, status=403)
+    
+    return Response({"status": "Authorized", "message": "Welcome to the interview session."})
+
+
 @api_view(['GET'])
-def get_allqa(request):
+def get_allqa(request):                ## To Display All Questions and Answers
     uri = os.getenv("mongo_uri")
     db, _ = get_db_handle("interview_db")
     collection = db['qa_pairs']
@@ -87,7 +118,7 @@ def get_allqa(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
-def get_single_question(request, requested_id):
+def get_single_question(request, requested_id):   ## To Display Single Question and Answers
     uri = os.getenv("mongo_uri")
     db, _ = get_db_handle("interview_db")
     collection = db['qa_pairs']
