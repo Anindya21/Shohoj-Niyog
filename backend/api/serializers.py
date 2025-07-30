@@ -10,7 +10,8 @@ class MongoQuestionPullSerializer(serializers.Serializer):
     role = serializers.CharField()
     stack= serializers.CharField()
     level = serializers.CharField()
-    qa_pairs = QAPairSerializer(many=True)
+    qa_pairs = serializers.DictField(child=QAPairSerializer()) 
+    allowed_candidates = serializers.ListField(child=serializers.EmailField(), required=False)
 
 class MongoQuestionSerializer(serializers.Serializer):
     question = serializers.CharField()

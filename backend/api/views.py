@@ -24,9 +24,10 @@ def get_role_stacks_levels(request):
     role = request.data.get('role')
     stacks = request.data.get('stacks')
     level = request.data.get('level')
+    allowed_candidates = request.data.get('allowed_candidates') 
 
-    if not role or not stacks or not level:
-        return Response({"error": "role, stacks, and level are required."}, status=400)
+    if not role or not stacks or not level or not allowed_candidates:
+        return Response({"error": "role, stacks, level, and allowed_candidates are required."}, status=400)
     
     graph= build_graph()
     
@@ -61,10 +62,11 @@ def get_role_stacks_levels(request):
         "stack": stacks, 
         "level": level,
         'qa_pairs': qa_pairs,
+        "allowed_candidates": allowed_candidates,
         'created': timezone.now()  # Add created timestamp
     }
 
-    inserted_rec= collection.insert_one({"role": role,"stack":stacks, "level":level ,'qa_pairs': qa_pairs})    
+    inserted_rec= collection.insert_one(document)    
 
     ID= str(inserted_rec.inserted_id)
     return Response({"status": "success", "message": "Questions and answers generated and saved.", "Session_ID": f"{ID}"})
