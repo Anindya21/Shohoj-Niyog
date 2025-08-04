@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from base.models import QAPair
+from .models import QAPair
 
 class QAPairSerializer(serializers.Serializer):
+    question_id= serializers.CharField()
     question= serializers.CharField()
     answer= serializers.CharField()
 
@@ -10,7 +11,7 @@ class MongoQuestionPullSerializer(serializers.Serializer):
     role = serializers.CharField()
     stack= serializers.CharField()
     level = serializers.CharField()
-    qa_pairs = serializers.DictField(child=QAPairSerializer()) 
+    qa_pairs = serializers.ListField(child=QAPairSerializer()) 
     allowed_candidates = serializers.ListField(child=serializers.EmailField(), required=False)
 
 class MongoQuestionSerializer(serializers.Serializer):

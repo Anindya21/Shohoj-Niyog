@@ -1,12 +1,14 @@
-from typing import TypedDict, List, Optional
+##graph/schema.py
+from typing import TypedDict, List, Optional, Any, Union
 
 class GraphState(TypedDict):
     role: str
     stacks: List[str]
     level: str
     question_answer_pairs: List[dict]
-    transcribed_text: Optional[str]
+    transcribed_text: Optional[List[str]]  # Changed from str to List[str]
     score: Optional[float]
+    video_file: Optional[Union[str, Any]] 
     
 
 # class TranscriptionState(TypedDict):
