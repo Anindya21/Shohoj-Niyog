@@ -6,7 +6,7 @@ from typing import Optional, List
 def create_default_state(**overrides)-> GraphState:
     default_state= {
 
-        "role": "",
+        "position": "",
         "stacks": [],
         "level": "",
         "question_answer_pairs": [],
@@ -19,9 +19,9 @@ def create_default_state(**overrides)-> GraphState:
     return default_state
 
 
-def create_qa_generation_state(role: str, stacks: List[str], level: str)-> GraphState:
+def create_qa_generation_state(position: str, stacks: List[str], level: str)-> GraphState:
     return create_default_state(
-        role=role,
+        position=position,
         stacks=stacks,
         level=level
     )
@@ -32,10 +32,10 @@ def create_transcription_state(video_file_path: str) -> GraphState:
         video_file=video_file_path
     )
 
-def create_full_workflow_state(role: str, stacks: List[str], level: str, video_file_path: str) -> GraphState:
+def create_full_workflow_state(position: str, stacks: List[str], level: str, video_file_path: str) -> GraphState:
     """Create state for complete workflow"""
     return create_default_state(
-        role=role,
+        position=position,
         stacks=stacks,
         level=level,
         video_file=video_file_path

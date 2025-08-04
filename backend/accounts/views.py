@@ -32,7 +32,8 @@ def login_user(request):
         return Response({
             "access": str(refresh.access_token),
             "refresh":str(refresh),
-            "username": user.username
+            "username": user.username,
+            "role": user.role
             })
     else:
         return Response({"detail":"Invalid Credential"}, status=status.HTTP_401_UNAUTHORIZED)

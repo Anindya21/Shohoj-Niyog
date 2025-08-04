@@ -22,57 +22,61 @@ graph= build_graph()
 @api_view(["POST"])
 def get_role_stacks_levels(request):  # Endpoint to Generate QA And Interview Session
     
-    role = request.data.get('role')
+    
+    position = request.data.get('position')
     stacks = request.data.get('stacks')
     level = request.data.get('level')
     allowed_candidates = request.data.get('allowed_candidates') 
 
-    if not role or not stacks or not level or not allowed_candidates:
-        return Response({"error": "role, stacks, level, and allowed_candidates are required."}, status=400)
+    if request.user.role == "candidate":
+        return Response({"message": "Unauthorized Action"})
+    else:
+        if not position or not stacks or not level or not allowed_candidates:
+            return Response({"error": "position, stacks, level, and allowed_candidates are required."}, status=400)
     
     
-    inputs = {
-        "role": role,
-        "stacks": stacks,
-        "level": level  
-    }
+        inputs = {
+            "position": position,
+            "stacks": stacks,
+            "level": level  
+        }
     
-    result = graph.invoke(inputs)
+        result = graph.invoke(inputs)
 
-    uri = os.getenv("mongo_uri")
-    db, _ = get_db_handle("interview_db")
-    collection = db['qa_pairs']
+        uri = os.getenv("mongo_uri")
+        db, _ = get_db_handle("interview_db")
+        collection = db['qa_pairs']
 
-    qa_pairs = []
-    
-    for qa in result["question_answer_pairs"]:
+        qa_pairs = []
         
-        q_id= f"q{str(uuid.uuid4())[:8]}"
+        for qa in result["question_answer_pairs"]:
+            
+            q_id= f"q{str(uuid.uuid4())[:8]}"
 
-        # question = qa['question']
-        # answer = qa['answer']
-        # qa_pairs.append({'question': question, 'answer': answer})
+            # question = qa['question']
+            # answer = qa['answer']
+            # qa_pairs.append({'question': question, 'answer': answer})
 
-        qa_pairs.append({
-            'question_id': q_id,
-            'question': qa['question'],
-            'answer': qa['answer']
-        })
-    
-    document = {
-        "role": role,
-        "stack": stacks, 
-        "level": level,
-        "qa_pairs": qa_pairs,
-        "question_count": len(qa_pairs),
-        "allowed_candidates": allowed_candidates,
-        "created": timezone.now()  # Add created timestamp
-    }
-    
-    inserted_rec= collection.insert_one(document)    
+            qa_pairs.append({
+                'question_id': q_id,
+                'question': qa['question'],
+                'answer': qa['answer']
+            })
+        
+        document = {
+            "position": position,
+            "stack": stacks, 
+            "level": level,
+            "qa_pairs": qa_pairs,
+            "question_count": len(qa_pairs),
+            "allowed_candidates": allowed_candidates,
+            "created": timezone.now()  # Add created timestamp
+        }
+        
+        inserted_rec= collection.insert_one(document)    
 
-    ID= str(inserted_rec.inserted_id)
-    return Response({"status": "success", "message": "Questions and answers generated and saved.", "Session_ID": f"{ID}"})
+        ID= str(inserted_rec.inserted_id)
+        return Response({"status": "success", "message": "Questions and answers generated and saved.", "Session_ID": f"{ID}"})
 
 @api_view(['POST'])
 def validate_candidate(request):

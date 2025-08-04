@@ -2,7 +2,7 @@
 from typing import TypedDict, List, Optional, Any, Union
 
 class GraphState(TypedDict):
-    role: str
+    position: str
     stacks: List[str]
     level: str
     question_answer_pairs: List[dict]
