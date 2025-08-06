@@ -1,4 +1,4 @@
-from graph.schema import GraphState
+from graph.schema import CandidateGraphState
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from nltk.tokenize import word_tokenize
 import nltk
@@ -6,7 +6,7 @@ import numpy as np
 nltk.download('punkt')
 
 
-def validate_answer_node(state: GraphState) -> GraphState:
+def validate_answer_node(state: CandidateGraphState) -> CandidateGraphState:
     
     def angular_similarity(vec1, vec2):
         cosine_sim = np.dot(vec1, vec2)/ (np.linalg.norm(vec1)* np.linalg.norm(vec2))

@@ -1,14 +1,14 @@
 from llm.model import load_llm
 from llm.prompts import SYSTEM_PROMPTS
 from utils.extract import extract_json_array
-from graph.schema import GraphState
+from graph.schema import RecruiterGraphState
 
 ##agents/ques_ans_gen.py
 
 llm= load_llm()
 
 
-def generate_question_and_answer_node(state: GraphState) -> GraphState:
+def generate_question_and_answer_node(state: RecruiterGraphState) -> RecruiterGraphState:
     prompts= (
         f"{SYSTEM_PROMPTS}\n\n"
         f"Position: {state['position']}\n"

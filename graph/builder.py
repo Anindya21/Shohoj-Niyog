@@ -1,47 +1,44 @@
 ##graph/builder.py
 
 from langgraph.graph import StateGraph, END
-from agents.ques_ans_gen import generate_question_and_answer_node 
-from agents.transcribe_answer import transcribe_answer_node
-from agents.validate_answer import validate_answer_node
-from graph.schema import GraphState
+from agents.recruiter.ques_ans_gen import generate_question_and_answer_node 
+from agents.recruiter.save_to_db import save_qa_pairs_node
+
+from agents.candidate.load_qa import load_qa_node
+from agents.candidate.transcribe_answer import transcribe_answer_node
+from agents.candidate.validate_answer import validate_answer_node
+from agents.candidate.save_response import save_response_node
+from graph.schema import RecruiterGraphState, CandidateGraphState
 
 
-def route_workflow(state:GraphState) -> str:
-    """ Determine next step based on current state."""
+def build_recruiter_graph():
 
-    if state.get("video_file") and not state.get("question_answer_pairs"):
-        return "transcribe_answer_node"
-    
-    else: 
-        return "generate_question_and_answer_node"
-
-def build_graph():
-
-    builder= StateGraph(GraphState)
+    builder= StateGraph(RecruiterGraphState)
     builder.add_node("generate_question_and_answer_node", generate_question_and_answer_node)
-    builder.add_node("transcribe_answer_node", transcribe_answer_node)
-    # builder.add_node("validate_answer_node", validate_answer_node)  
+    builder.add_node("save_qa_pairs_node", save_qa_pairs_node)
     
-    builder.set_conditional_entry_point(route_workflow)
+    builder.set_entry_point("generate_question_and_answer_node")
+    builder.add_edge("generate_question_and_answer_node", "save_qa_pairs_node")
+    
+    builder.add_edge("save_qa_pairs_node", END) 
+    recruiter_graph= builder.compile()
 
-    builder.add_conditional_edges(
-        "generate_question_and_answer_node", 
-        lambda state: "transcribe_answer_node" if state.get("video_file") else END
+    return recruiter_graph
 
-    )
+def build_candidate_graph():
 
-    # builder.add_conditional_edges(
-    #     "transcribe_answer_node",
-    #     lambda state: "validate_answer_node" if state.get("question_answer_pairs") else END
-    # )
+    builder= StateGraph(CandidateGraphState)
 
-    # builder.set_entry_point("generate_question_and_answer_node")
-    # builder.add_edge("generate_question_and_answer_node", "transcribe_answer_node")
-    # # builder.add_edge("transcribe_answer_node", "validate_answer_node")
-    # # builder.add_edge("validate_answer_node",END)
+    builder.add_node("load_qa_node", load_qa_node)
+    builder.add_node("transcribe_answer_node", transcribe_answer_node)
+    builder.add_node("validate_answer_node", validate_answer_node)
+    builder.add_node("save_candidate_response_node", save_response_node)
 
-    # builder.add_edge("transcribe_answer_node", END) # For testing only this node, REMOVE LATER
-    graph= builder.compile()
+    builder.set_entry_point("load_qa_node")
+    builder.add_edge("load_qa_node","transcribe_answer_node")
+    builder.add_edge("transcribe_answer_node","validate_answer_node")
+    builder.add_edge("validate_answer_node", "save_candidate_response_node")
+    builder.add_edge("save_candidate_response_node",END)
 
-    return graph
+    candidate_graph= builder.compile()
+    return candidate_graph

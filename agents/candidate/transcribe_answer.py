@@ -1,9 +1,9 @@
-from graph.schema import GraphState
+from graph.schema import CandidateGraphState
 import datetime
 import whisper
 
 ##agents/transcribe_answer.py
-def transcribe_answer_node(state: GraphState) -> GraphState:
+def transcribe_answer_node(state: CandidateGraphState) -> CandidateGraphState:
     
     model= whisper.load_model("small")
 

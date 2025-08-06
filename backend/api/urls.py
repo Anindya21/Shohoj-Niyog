@@ -8,6 +8,6 @@ urlpatterns = [
     path('findall/', views.get_allqa, name='GetAllQA'),
     path('find/<str:requested_id>', views.get_single_question, name="Get Single Question"),
     path('val/', views.validate_candidate, name= "Authorization for Interview Access"),
-    path('res/', views.user_response, name="Transcribe Audio")
+    # path('res/', views.user_response, name="Transcribe Audio")
     
 ] 
