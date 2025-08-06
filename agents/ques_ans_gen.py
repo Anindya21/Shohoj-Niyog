@@ -11,9 +11,10 @@ llm= load_llm()
 def generate_question_and_answer_node(state: GraphState) -> GraphState:
     prompts= (
         f"{SYSTEM_PROMPTS}\n\n"
-        f"Role: {state['role']}\n"
-        f"Stacks: {', '.join(state['stacks'])}\n"
-        f"Level: {state['level']}"
+        f"Position: {state['position']}\n"
+        f"Stacks: {state['stacks']}\n"
+        f"Level: {state['level']}\n"
+        f"Number Of Questions: {state['num_questions']}"
     )
 
     for attempt in range(3):

@@ -5,6 +5,7 @@ class GraphState(TypedDict):
     position: str
     stacks: List[str]
     level: str
+    num_questions: int
     question_answer_pairs: List[dict]
     transcribed_text: Optional[List[str]]  # Changed from str to List[str]
     score: Optional[float]

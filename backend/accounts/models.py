@@ -10,9 +10,14 @@ class CustomUser(AbstractUser):
         ('candidate', 'Candidate'),
     )
 
+    email= models.EmailField(unique=True)
+
     phone= models.CharField(max_length=11, blank=True, null=True)
     role= models.CharField(max_length=20, choices=ROLE_CHOICES, default='candidate')
 
+    USERNAME_FIELD= 'email'
+    REQUIRED_FIELDS= ['username','role','phone']
+    
     def __str__(self):
-        return f"{self.username}({self.role})"
+        return f"{self.email}({self.role})"
     

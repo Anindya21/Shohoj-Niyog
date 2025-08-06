@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import QAPair
-
 class QAPairSerializer(serializers.Serializer):
     question_id= serializers.CharField()
     question= serializers.CharField()
