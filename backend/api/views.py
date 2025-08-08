@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 recruiter_graph= build_recruiter_graph()
 candidate_graph= build_candidate_graph()
 
+#================================== Interviewer =======================================
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def get_role_stacks_levels(request):  # Endpoint to Generate QA And Interview Session
@@ -80,7 +81,14 @@ def validate_candidate(request):
 
 
 @api_view(['GET'])
-def get_allqa(request):                ## To Display All Questions and Answers
+@permission_classes([IsAuthenticated])
+def get_allqa(request):
+    
+    user= request.user               
+    
+    if user.role == "candidate":
+        return Response({"message": "Unauthorized Action"}, status=403)
+    
     uri = os.getenv("mongo_uri")
     db, _ = get_db_handle("interview_db")
     collection = db['qa_pairs']
@@ -94,8 +102,17 @@ def get_allqa(request):                ## To Display All Questions and Answers
     
     return Response(serializer.data)
 
+
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_single_question(request, requested_id):   ## To Display Single Question and Answers
+    
+    user= request.user               
+    
+    if user.role == "candidate":
+        return Response({"message": "Unauthorized Action"}, status=403)
+    
+
     uri = os.getenv("mongo_uri")
     db, _ = get_db_handle("interview_db")
     collection = db['qa_pairs']
@@ -112,6 +129,9 @@ def get_single_question(request, requested_id):   ## To Display Single Question 
 
     serializer = MongoQuestionSerializer(qa_pairs, many=True)
     return Response(serializer.data)
+
+# =============================== Candidate =========================================
+
 
 # @api_view()
 # def validate_answer(request):
