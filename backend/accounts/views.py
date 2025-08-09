@@ -32,7 +32,7 @@ def register_user(request):
 
     sessions_with_email = list(collection.find({"allowed_candidates": email}))
     
-    print(f"✅ Found {len(sessions_with_email)} sessions for this candidate")
+    print(f"Found {len(sessions_with_email)} sessions for this candidate")
     
     if not sessions_with_email:
         return Response({
@@ -90,7 +90,7 @@ def login_user(request):
 
     if user is not None:
         refresh = RefreshToken.for_user(user)
-
+    
         return Response({
             "access": str(refresh.access_token),
             "refresh":str(refresh),
