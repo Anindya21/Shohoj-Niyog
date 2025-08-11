@@ -11,6 +11,7 @@ from bson.errors import InvalidId
 from typing import Dict, Any, Optional
 from django.utils import timezone
 import os, uuid, logging, mimetypes, tempfile
+from rest_framework import status
 
 load_env()
 
@@ -21,6 +22,7 @@ recruiter_graph= build_recruiter_graph()
 candidate_graph= build_candidate_graph()
 
 #================================== Interviewer =======================================
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def get_role_stacks_levels(request):  # Endpoint to Generate QA And Interview Session
@@ -50,34 +52,7 @@ def get_role_stacks_levels(request):  # Endpoint to Generate QA And Interview Se
     result = recruiter_graph.invoke(inputs)
 
     return Response({"status": "success", "message": "Questions and answers generated and saved.", "Session_ID": result["interview_id"]})
-
-@api_view(['POST'])
-def validate_candidate(request):
-
-    session_id = request.data.get('session_id')
-    email = request.data.get('email')
-
-    if not session_id or not email:
-        return Response({"error": "session_id and email are required."}, status=400)
-    
-    try:
-        uri = os.getenv("mongo_uri")
-        db, _ = get_db_handle("interview_db")
-        collection = db['qa_pairs']
-
-        session_doc = collection.find_one({'_id': ObjectId(session_id)})
-    except:
-        return Response({"error": "Invalid session_id format."}, status=400)
-
-    if not session_doc:
-        return Response({"error": "Session not found."}, status=404) 
-    
-    allowed = session_doc.get('allowed_candidates', [])
-
-    if email not in allowed:
-        return Response({"error": "Candidate not allowed for this session."}, status=403)
-    
-    return Response({"status": "Authorized", "message": "Welcome to the interview session."})
+# ===================================================================================================
 
 
 @api_view(['GET'])
@@ -132,9 +107,72 @@ def get_single_question(request, requested_id):   ## To Display Single Question 
 
 # =============================== Candidate =========================================
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def validate_candidate(request):
 
-# @api_view()
-# def validate_answer(request):
+    user = request.user
+
+    session_id = request.data.get('session_id')
+    user_id = str(user.id)
+
+    if not session_id:
+        return Response({"error": "session_id is required."}, status=400)
+    
+    try:
+        uri = os.getenv("mongo_uri")
+        db, _ = get_db_handle("interview_db")
+        collection = db['qa_pairs']
+
+        session_doc = collection.find_one({'_id': ObjectId(session_id)})
+    except:
+        return Response({"error": "Invalid session_id format."}, status=400)
+
+    if not session_doc:
+        return Response({"error": "Session not found."}, status=404) 
+    
+    allowed = session_doc.get('allowed_candidates', [])
+
+    if user_id not in allowed:
+        return Response({"error": "Candidate not allowed for this session."}, status=403)
+    
+    return Response({"status": "Authorized", "message": "Welcome to the interview session."})
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def user_response(response):
+    user = response.user
+
+    user_id = str(user.id)
+    session_id = response.data.get("session_id")
+
+    # if user.role != "candidate":
+    #     return Response({"message": "Unauthorized Action"}, status=status.HTTP_403_FORBIDDEN)
+    
+    uri = os.getenv("mongo_uri")
+    db, _ = get_db_handle("interview_db")
+    qa_col = db['qa_pairs']
+    user_col = db['user_db']
+
+    if not session_id:
+        return Response({"error": "session_id is required."}, status=400)
+    
+    try:
+        session_doc = qa_col.find_one({'_id': ObjectId(session_id)})
+        return Response({"status": "success", "message": "Session found."})
+
+    except:
+        return Response({"error": "Invalid session_id format."}, status=400)
+    
+    
+
+    
+    
+
+
+
+
 
 # @api_view(['POST'])
 # def user_response(response):         ### Transcribes the response video and stores it in the user's collection database
