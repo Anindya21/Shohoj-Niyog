@@ -145,25 +145,91 @@ def user_response(response):
     user = response.user
 
     user_id = str(user.id)
+    user_mail = user.email
     session_id = response.data.get("session_id")
+    user_name = user.get_full_name() or user.username
 
-    # if user.role != "candidate":
-    #     return Response({"message": "Unauthorized Action"}, status=status.HTTP_403_FORBIDDEN)
+    
+    if not session_id:
+        return Response({"error": "session_id is required."}, status=400)
+    
+    if user.role != "candidate":
+        return Response({"message": "You Must be a candidate to join an interview"}, status=status.HTTP_403_FORBIDDEN)
     
     uri = os.getenv("mongo_uri")
     db, _ = get_db_handle("interview_db")
     qa_col = db['qa_pairs']
-    user_col = db['user_db']
 
-    if not session_id:
-        return Response({"error": "session_id is required."}, status=400)
+
+    allowed_candidates= qa_col.find_one({'_id': ObjectId(session_id)}).get('allowed_candidates', [])
+
+    if user_id not in allowed_candidates:
+        return Response({"error": "You are not allowed to join this session."}, status=403)
     
-    try:
-        session_doc = qa_col.find_one({'_id': ObjectId(session_id)})
-        return Response({"status": "success", "message": "Session found."})
 
-    except:
-        return Response({"error": "Invalid session_id format."}, status=400)
+    video_files = response.FILES.getlist("video")
+
+    if not video_files:
+        return Response({"error": "video_files is required."}, status=400)
+    
+
+    temp_video_paths = []
+
+    try:
+
+        for i, video_file in enumerate(video_files):
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as temp_file:
+                for chunk in video_file.chunks():
+                    temp_file.write(chunk)
+                temp_video_paths.append(temp_file.name)
+
+        
+        inputs= {
+            "interview_id": session_id,
+            "candidate_id": user_id,
+            "candidate_name": user_name,
+            "candidate_mail": user_mail,
+            "video_files": temp_video_paths,
+            "transcribed_text": [],
+            "question_answer_pair": [],
+            "responses": [],
+            "total_score": None,
+            "allowed_candidates": []
+            }
+        
+        result = candidate_graph.invoke(inputs)
+
+        if result.get("save_status") == "success":
+            return Response({
+                "status": "success",
+                "message": "Responses saved successfully. Thank you for joining the interview session.",
+                "responsed_id": result.get("responsed_id")
+
+            })
+        
+        else:
+            return Response({"error": "Failed to save responses"}, status=500)
+        
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+    
+
+    finally:
+        for temp_path in temp_video_paths:
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
+
+
+    
+    # try:
+    #     session_doc = qa_col.find_one({'_id': ObjectId(session_id)})
+
+    #     return Response({"status": "success", "message": "Session found."})
+
+    # except:
+    #     return Response({"error": "Invalid session_id format."}, status=400)
+    
     
     
 

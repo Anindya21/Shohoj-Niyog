@@ -13,7 +13,11 @@ class RecruiterGraphState(TypedDict):
 class CandidateGraphState(TypedDict):
     interview_id: str
     candidate_id: str
+    candidate_mail: Optional[str]
+    candidate_name: Optional[str]
+    video_files: List[str]
     transcribed_text: List[str]
+    responses: List[str]
     question_answer_pair: List[dict]
-    score: Optional[List[float]]
+    scores: Optional[List[float]]
 

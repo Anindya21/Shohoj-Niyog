@@ -17,14 +17,14 @@ class MongoQuestionSerializer(serializers.Serializer):
     question = serializers.CharField()
 
 
-class VideoSerializer(serializers.Serializer):
-    video_file= serializers.FileField(upload_to ='res/')
+# class VideoSerializer(serializers.Serializer):
+#     video_file= serializers.FileField(upload_to ='res/')
 
 
-class TranscriptionSerializer(serializers.Serializer):
-    video_files = serializers.ListField(child=VideoSerializer())
-    trnscribed_text= serializers.ListField(child=serializers.CharField())
-    session_id = serializers.CharField()
-    candidate_id = serializers.CharField()
+# class TranscriptionSerializer(serializers.Serializer):
+#     video_files = serializers.ListField(child=VideoSerializer())
+#     trnscribed_text= serializers.ListField(child=serializers.CharField())
+#     session_id = serializers.CharField()
+#     candidate_id = serializers.CharField()
 
     

@@ -8,30 +8,34 @@ def transcribe_answer_node(state: CandidateGraphState) -> CandidateGraphState:
     model= whisper.load_model("small")
 
     options= whisper.DecodingOptions(language="en", fp16=False)
-    video_file = state.get("video_file", None)
+    video_files = state.get("video_files", None)
     
-    if not video_file:
-        print("No video file provided")
+    if not video_files:
+        print("No video files provided")
         return {
             **state,  # Keep all existing state
-            "transcribed_text": state.get("transcribed_text", []),
+            "transcribed_text": [],
         }
     
-    try:
-        result= model.transcribe(video_file) # Replace with actual captured video
-        existing_transcriptions = state.get("transcribed_text", [])
-        answers.append(result["text"])
+    transcriptions = []
+    
+    for i, video in enumerate(video_files):
+        try:
+            print("Transciribing {i} th video")
+            result= model.transcribe(video) # Replace with actual captured video
+            
+            transcriptions.append(result["text"].strip())
 
-        print("Transcription successful")
+            # existing_transcriptions = state.get("transcribed_text", [])
+            # answers.append(result["text"])
 
-    except:
-        answers = []
-        answer= result["text"]
-        answers.append(answer)
-        
-        print("Transcription Successful in except block")
+            print("Transcription successful for video {i}")
 
+        except:
+            print("Transcription failed for video {i}")
+            transcriptions.append("")
+            
     return {
         **state,
-        "transcribed_text": answers,
+        "transcribed_text": transcriptions,
     }
