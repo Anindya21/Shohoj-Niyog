@@ -21,7 +21,7 @@ def transcribe_answer_node(state: CandidateGraphState) -> CandidateGraphState:
     
     for i, video in enumerate(video_files):
         try:
-            print("Transciribing {i} th video")
+            print(f"Transciribing {i} th video")
             result= model.transcribe(video) # Replace with actual captured video
             
             transcriptions.append(result["text"].strip())
@@ -29,10 +29,10 @@ def transcribe_answer_node(state: CandidateGraphState) -> CandidateGraphState:
             # existing_transcriptions = state.get("transcribed_text", [])
             # answers.append(result["text"])
 
-            print("Transcription successful for video {i}")
+            print(f"Transcription successful for video {i}")
 
         except:
-            print("Transcription failed for video {i}")
+            print(f"Transcription failed for video {i}")
             transcriptions.append("")
             
     return {

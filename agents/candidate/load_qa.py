@@ -1,6 +1,7 @@
 from graph.schema import CandidateGraphState
 from db.mongo import get_db_handle
 import os
+from bson.objectid import ObjectId
 
 # Load the question-answer pairs along with question ID for a candidate's interview session
 
@@ -20,18 +21,17 @@ def load_qa_node(state: CandidateGraphState) -> CandidateGraphState:
         db, _ = get_db_handle("interview_db")
         collection = db['qa_pairs']
 
-        
-        session=collection.find_one({"_id": interview_id})
+        session= collection.find_one({"_id": ObjectId(interview_id)})
 
         if not session:
-            print("No interview Session found for {interview_id}")
+            print(f"No interview Session found for {interview_id}")
             return {
                 **state,
                 "question_answer_pair": []
             }
         
         question_data = []
-
+    
         qa_pairs = session.get("qa_pairs", [])
 
         for qa in qa_pairs:
@@ -41,7 +41,7 @@ def load_qa_node(state: CandidateGraphState) -> CandidateGraphState:
                 "expected_answer": qa.get("answer")
             })
 
-        print("Loaded {interview_id} sessions relevant data")
+        print(f"Loaded {interview_id} sessions relevant data")
 
         return{
             **state,

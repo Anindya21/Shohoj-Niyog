@@ -79,13 +79,13 @@ def get_allqa(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def get_single_question(request, requested_id):   ## To Display Single Question and Answers
     
-    user= request.user               
+    # user= request.user               
     
-    if user.role == "candidate":
-        return Response({"message": "Unauthorized Action"}, status=403)
+    # if user.role == "candidate":
+    #     return Response({"message": "Unauthorized Action"}, status=403)
     
 
     uri = os.getenv("mongo_uri")
@@ -229,80 +229,4 @@ def user_response(response):
 
     # except:
     #     return Response({"error": "Invalid session_id format."}, status=400)
-    
-    
-    
 
-    
-    
-
-
-
-
-
-# @api_view(['POST'])
-# def user_response(response):         ### Transcribes the response video and stores it in the user's collection database
-
-#     uri = os.getenv("mongo_uri")
-#     db, _ = get_db_handle("interview_db")
-#     user_col = db['user_db']
-#     ques_col = db['qa_pairs']
-
-#     video_file = response.data.get("video")
-#     # ques_ids = response.data.get("question_id")
-
-#     if not video_file:
-#         return Response({"error": "video_file and email are required."}, status=400)
-
-#     mime_type, _ = mimetypes.guess_type(response.FILES['video'].name)
-    
-#     if mime_type == 'video/mp4':
-#         print("Video file is valid. Proceeding with upload...") 
-#     else:
-#         return Response({"message": "Invalid video format. Please upload an MP4 file."}, status=400)
-    
-#     try:
-#             # ques_id= ques_col.find_one({'qa_pairs.question_id': 'uuid'})
-#         with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as temp_file:
-#             for chunk in video_file.chunks():
-#                 temp_file.write(chunk)
-#             temp_file_path = temp_file.name
-        
-#         transcription_state = create_transcription_state(temp_file_path)
-
-#         given_ans = graph.invoke(transcription_state)
-#         os.unlink(temp_file_path)
-
-#         transcribed_text = given_ans.get('transcribed_text', [])
-
-#         if not transcribed_text:
-#             return Response({"error": "Transcription failed or no text found."}, status=500)
-
-
-#         return Response({"status": "success", "message": "Transcription successful.", "transcribed_text": transcribed_text})
-
-#     except Exception as e:
-#         if 'temp_file_path' in locals():
-#             try:
-#                 os.unlink(temp_file_path)
-#             except:
-#                 pass
-        
-#         print(f"Error during transcription: {str(e)}")
-#         return Response({"error": f"An error occurred during transcription: {str(e)}"}, status=500)
-
-    # for video_file, ques_id in zip(videos, ques_ids):
-    #     try:
-    #         ques_id= ques_col.find_one({'qa_pairs.question_id': 'uuid'})
-
-    #         given_ans = graph.invoke({'start': 'transcribe_answer_node', 'video_file': video_file})
-
-    #         transcribed_text = given_ans.get('transcribed_text', [])
-
-    #         if not transcribed_text:
-    #             return Response({"error": "Transcription failed or no text found."}, status=500)
-            
-    #         return Response({"status": "success", "message": "Transcription successful.", "transcribed_text": transcribed_text})
-    #     except Exception as e:
-    #         return Response({"error": f"An error occurred during transcription: {str(e)}"}, status=500)
-    
