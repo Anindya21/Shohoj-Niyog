@@ -7,6 +7,7 @@ class QAPairSerializer(serializers.Serializer):
 
 class MongoQuestionPullSerializer(serializers.Serializer):
     id= serializers.CharField(source='_id')
+    created_by = serializers.CharField(),
     position = serializers.CharField()
     stack= serializers.CharField()
     level = serializers.CharField()

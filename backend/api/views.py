@@ -25,7 +25,7 @@ candidate_graph= build_candidate_graph()
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def get_role_stacks_levels(request):  # Endpoint to Generate QA And Interview Session
+def generate_interview_session(request):  # Endpoint to Generate QA And Interview Session
     
     user= request.user
     
@@ -46,29 +46,36 @@ def get_role_stacks_levels(request):  # Endpoint to Generate QA And Interview Se
             "stacks": stacks,
             "level": level,
             "num_questions":num_questions,
-            "allowed_candidates":allowed_candidates  
+            "allowed_candidates":allowed_candidates,
+            "created_by": str(user.id) 
             }
     
     result = recruiter_graph.invoke(inputs)
 
-    return Response({"status": "success", "message": "Questions and answers generated and saved.", "Session_ID": result["interview_id"]})
+    return Response({"status": "success", "message": "Questions and answers generated and saved.", 
+                     "Session_ID": result["interview_id"], 
+                     "Created_By": str(user.id)}, 
+                     status=status.HTTP_201_CREATED)
 # ===================================================================================================
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_allqa(request):
+def get_allqa(request, requested_id):  ## To Display All Questions and Answers
     
     user= request.user               
     
     if user.role == "candidate":
         return Response({"message": "Unauthorized Action"}, status=403)
     
+    user_id= str(user.id)
+
+
     uri = os.getenv("mongo_uri")
     db, _ = get_db_handle("interview_db")
     collection = db['qa_pairs']
 
-    docs= list(collection.find())
+    docs= list(collection.find({'created_by': user_id}))
     
     for doc in docs:
         doc['_id'] = str(doc['_id'])

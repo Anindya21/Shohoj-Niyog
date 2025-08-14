@@ -49,8 +49,8 @@ def validate_answer_node(state: CandidateGraphState) -> CandidateGraphState:
             model.build_vocab(tagged_data)
             model.train(tagged_data, total_examples=model.corpus_count, epochs=model.epochs)        
         
-            vec_ideal =model.infer_vector(tokenized_ideal)
-            vec_given =model.infer_vector(tokenized_given)
+            vec_ideal=model.infer_vector(tokenized_ideal)
+            vec_given=model.infer_vector(tokenized_given)
 
             similarity = angular_similarity(vec_ideal, vec_given)
             score= float(similarity*9+1,2)
@@ -65,36 +65,3 @@ def validate_answer_node(state: CandidateGraphState) -> CandidateGraphState:
         **state,
         "scores": scores
     }
-
-        
-    # ideal_ans = []
-    # for each in data:
-    #     ideal_ans.append(each['answer'])
-
-    # given_ans = state['transcribed_text']
-    
-    # # Now to tokenize the data
-    
-    # tokenized_ideal = [word_tokenize(document.lower()) for document in ideal_ans]
-    # tokenized_given = [word_tokenize(document.lower()) for document in given_ans]
-    
-    # tagged_data = [TaggedDocument(words=words, tags=[str(idx)]) for idx, words in enumerate(tokenized_ideal)]
-
-    
-    
-    
-
-    # scores= []
-
-    # for each in range(len(tokenized_given)):
-    #     vec_ideal =model.infer_vector(tokenized_ideal[each])
-    #     vec_given =model.infer_vector(tokenized_given[each])
-
-    #     similarity = angular_similarity(vec_ideal, vec_given)
-    #     scores.append(similarity)
-
-
-    # return {
-    #     **state,
-    #     "score": scores,
-    #     }
