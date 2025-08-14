@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import QAPair
-from .serializers import MongoQuestionPullSerializer, MongoQuestionSerializer
+from .serializers import MongoQuestionPullSerializer, MongoQuestionSerializer, CandidateSessionsSerializer
 from db.mongo import get_db_handle
 from graph.builder import build_recruiter_graph, build_candidate_graph
 from utils.env_loader import load_env
@@ -65,15 +65,28 @@ def get_allqa(request, requested_id):  ## To Display All Questions and Answers
     
     user= request.user               
     
+    uri = os.getenv("mongo_uri")
+    db, _ = get_db_handle("interview_db")
+    collection = db['qa_pairs']
+
     if user.role == "candidate":
-        return Response({"message": "Unauthorized Action"}, status=403)
+
+        docs= list(collection.find(
+            {"allowed_candidates": 
+             {"$in": [str(user.id), user.email]}
+             }))
+
+        for doc in docs:
+            doc['_id'] = str(doc['_id'])
+        
+        serializer= CandidateSessionsSerializer(docs, many=True)
+        
+        return Response(serializer.data)
     
     user_id= str(user.id)
 
 
-    uri = os.getenv("mongo_uri")
-    db, _ = get_db_handle("interview_db")
-    collection = db['qa_pairs']
+    
 
     docs= list(collection.find({'created_by': user_id}))
     
@@ -93,8 +106,6 @@ def get_single_question(request, requested_id):   ## To Display Single Question 
     
     # if user.role == "candidate":
     #     return Response({"message": "Unauthorized Action"}, status=403)
-    
-
     uri = os.getenv("mongo_uri")
     db, _ = get_db_handle("interview_db")
     collection = db['qa_pairs']
