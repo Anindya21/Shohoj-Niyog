@@ -1,8 +1,8 @@
 # Shohoj Niyog
 
-Shohoj Niyog is a **machine learning–powered full-stack recruitment platform** where recruiters can create AI-generated interview sessions, invite candidates, and evaluate their responses automatically using AI scoring.
+Shohoj Niyog is a **AI–powered full-stack recruitment platform** where recruiters can create AI-generated interview sessions, invite candidates, and evaluate their responses automatically using semantic similarity scoring.
 
-The project backend is built with **Django** + **Django REST Framework**, with **LangGraph** for agentic workflows and **HuggingFacePipeline** for AI-powered interview question generation. The frontend (planned) will be developed with **Next.js**, **TypeScript**, and **Tailwind CSS**.
+The project backend is built with **Django** + **Django REST Framework**, with **LangGraph** for agentic workflows and **HuggingFacePipeline** for AI-powered interview question generation.
 
 ---
 
@@ -12,7 +12,7 @@ The project backend is built with **Django** + **Django REST Framework**, with *
 - **Authentication & Authorization** with JWT.
 - **AI-Generated Interview Questions** using LangGraph & HuggingFace.
 - **Video Answer Submission** for candidates.
-- **Automatic AI Scoring** of candidate responses.
+- **Semantic Similarity Scoring** of candidate responses.
 - **Recruiter Dashboard** to view scores and update hiring status.
 - **Candidate Dashboard** to view interview statuses.
 
@@ -27,15 +27,9 @@ The project backend is built with **Django** + **Django REST Framework**, with *
 - HuggingFacePipeline (AI question generation)
 - MongoDB (Data storage)
 
-**Frontend (Planned):**
-- Next.js
-- TypeScript
-- Tailwind CSS
-
 **Other Tools:**
 - Whisper (for video transcription)
 - JWT Authentication
-
 ---
 
 ## 📂 Project Setup
@@ -114,3 +108,4 @@ http://127.0.0.1:8000/
 
 ## 📜 License
 This project is licensed under the MIT License.
+
