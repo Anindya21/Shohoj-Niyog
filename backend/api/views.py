@@ -10,6 +10,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from typing import Dict, Any, Optional
 from django.utils import timezone
+# from datetime import datetime,timezone  
 import os, uuid, logging, mimetypes, tempfile
 from rest_framework import status
 
@@ -37,6 +38,7 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
     level = request.data.get('level')
     allowed_candidates = request.data.get('allowed_candidates')
     num_questions= request.data.get('num_questions')
+    scheduled= request.data.get('scheduled', timezone.now().isoformat())
 
     if not position or not stacks or not level or not allowed_candidates:
         return Response({"error": "position, stacks, level, and allowed_candidates are required."}, status=400)
@@ -47,7 +49,8 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
             "level": level,
             "num_questions":num_questions,
             "allowed_candidates":allowed_candidates,
-            "created_by": str(user.id) 
+            "created_by": str(user.id),
+            "scheduled":  scheduled
             }
     
     result = recruiter_graph.invoke(inputs)

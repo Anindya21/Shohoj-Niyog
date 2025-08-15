@@ -10,6 +10,7 @@ class RecruiterGraphState(TypedDict):
     interview_id: Optional[str]
     allowed_candidates: List[str]
     created_by: str
+    scheduled: str
 
 class CandidateGraphState(TypedDict):
     interview_id: str

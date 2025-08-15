@@ -11,7 +11,6 @@ dependencies = [
     "django-environ==0.12.0",
     "djangorestframework>=3.16.0",
     "djangorestframework-simplejwt>=5.5.1",
-    "djongo>=1.2.31",
     "dnspython==2.3.0",
     "ffmpeg>=1.4",
     "gensim>=4.3.3",
@@ -37,3 +36,8 @@ url = "https://download.pytorch.org/whl/cu128"
 
 [[tool.uv.index]]
 url = "https://download.pytorch.org/whl/cu123"
+
+[dependency-groups]
+dev = [
+    "deptry>=0.23.1",
+]
