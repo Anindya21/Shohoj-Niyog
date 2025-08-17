@@ -1,67 +1,43 @@
 from graph.schema import CandidateGraphState
-from gensim.models.doc2vec import Doc2Vec, TaggedDocument
-from nltk.tokenize import word_tokenize
-import nltk
-import numpy as np
-nltk.download('punkt')
+from sentence_transformers import SentenceTransformer
+from scipy.spatial import distance
+
+# Load model once globally (so it doesn’t reload every function call)
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
 def validate_answer_node(state: CandidateGraphState) -> CandidateGraphState:
-    
-    def angular_similarity(vec1, vec2):
-        norm1 = np.linalg.norm(vec1)
-        norm2 = np.linalg.norm(vec2)
-        if norm1 == 0 or norm2 == 0:
-            return 0.0
-        return np.dot(vec1, vec2) / (norm1 * norm2)
-
-    
-    transcribed_text = state['transcribed_text']
-
-    qa_pair= state['question_answer_pair']
+    transcribed_text = state.get('transcribed_text', [])
+    qa_pair = state.get('question_answer_pair', [])
 
     if not transcribed_text or not qa_pair:
         print("No transcribed text or question-answer pairs provided.")
-        return {
-            **state,
-            "score": []
-        }
+        return {**state, "scores": []}
 
     scores = []
 
     for expected, given in zip(qa_pair, transcribed_text):
-        ideal_ans= expected.get("expected_answer", "")
-        
-        if given == "":
+        ideal_ans = expected.get("expected_answer", "")
+
+        if not given.strip():
             print(f"No answer provided for {expected['question_id']}")
             scores.append(0.0)
             continue
-        
+
         try:
-            tokenized_ideal = word_tokenize(ideal_ans.lower())
-            tokenized_given = word_tokenize(given.lower())
-            
-            tagged_data = [
-                TaggedDocument(words=tokenized_ideal, tags=["ideal"]),
-                TaggedDocument(words=tokenized_given, tags=["given"])
-            ]
-            model = Doc2Vec(vector_size=100, window=4, min_count=1, workers=4, epochs=500)
+            # Encode both ideal and given answer
+            vec_ideal = model.encode([ideal_ans])[0]
+            vec_given = model.encode([given])[0]
 
-            model.build_vocab(tagged_data)
-            model.train(tagged_data, total_examples=model.corpus_count, epochs=model.epochs)        
-        
-            vec_ideal=model.infer_vector(tokenized_ideal)
-            vec_given=model.infer_vector(tokenized_given)
+            # Cosine similarity
+            similarity = 1 - distance.cosine(vec_ideal, vec_given)
 
-            similarity = angular_similarity(vec_ideal, vec_given)
-            score= float(similarity*9+1,2)
+            # Scale similarity (0–1) to (1–10)
+            score = round(similarity * 9 + 1, 2)
 
             scores.append(score)
 
-        except:
-            print(f"Error scoring the answer for {expected['question_id']}")
+        except Exception as e:
+            print(f"Error scoring the answer for {expected['question_id']}: {e}")
             scores.append(0.0)
-        
-    return{
-        **state,
-        "scores": scores
-    }
+
+    return {**state, "scores": scores}

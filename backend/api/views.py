@@ -162,12 +162,12 @@ def validate_candidate(request):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def user_response(response):
-    user = response.user
+def user_response(request):
+    user = request.user
 
     user_id = str(user.id)
     user_mail = user.email
-    session_id = response.data.get("session_id")
+    session_id = request.data.get("session_id")
     user_name = user.get_full_name() or user.username
 
     
@@ -188,7 +188,7 @@ def user_response(response):
         return Response({"error": "You are not allowed to join this session."}, status=403)
     
 
-    video_files = response.FILES.getlist("video")
+    video_files = request.FILES.getlist("video")
 
     if not video_files:
         return Response({"error": "video_files is required."}, status=400)
@@ -220,14 +220,15 @@ def user_response(response):
         
         result = candidate_graph.invoke(inputs)
 
-        if result.get("save_status") == "success":
+        if result.get("response_id") is not None:
+
             return Response({
                 "status": "success",
                 "message": "Responses saved successfully. Thank you for joining the interview session.",
                 "responsed_id": result.get("responsed_id")
 
-            })
-        
+            }, status=status.HTTP_201_CREATED)
+            
         else:
             return Response({"error": "Failed to save responses"}, status=500)
         
@@ -240,14 +241,4 @@ def user_response(response):
         for temp_path in temp_video_paths:
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
-
-
-    
-    # try:
-    #     session_doc = qa_col.find_one({'_id': ObjectId(session_id)})
-
-    #     return Response({"status": "success", "message": "Session found."})
-
-    # except:
-    #     return Response({"error": "Invalid session_id format."}, status=400)
 

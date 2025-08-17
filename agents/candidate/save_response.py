@@ -49,6 +49,7 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
             "candidate_mail": candidate_mail,
             "responses": responses,
             "total_score": average_score,
+            "decision": "pending",
             "created": datetime.now(timezone.utc)
         })
 
@@ -61,8 +62,6 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
             "total_score": average_score,
             "save_status": "success",
             "responsed_id": str(result.inserted_id)
-
-
         }
     
     except:
