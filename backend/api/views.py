@@ -3,9 +3,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import QAPair
 from .serializers import MongoQuestionPullSerializer, MongoQuestionSerializer, CandidateSessionsSerializer
-from db.mongo import get_db_handle
-from graph.builder import build_recruiter_graph, build_candidate_graph
-from utils.env_loader import load_env
+from logics.db.mongo import get_db_handle
+from logics.graph.builder import build_recruiter_graph, build_candidate_graph
+from logics.utils.env_loader import load_env
 from bson import ObjectId
 from bson.errors import InvalidId
 from typing import Dict, Any, Optional
@@ -220,7 +220,7 @@ def user_response(request):
         
         result = candidate_graph.invoke(inputs)
 
-        if result.get("response_id") is not None:
+        if result.get("responsed_id") is not None:
 
             return Response({
                 "status": "success",

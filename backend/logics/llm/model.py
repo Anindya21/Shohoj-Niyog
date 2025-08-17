@@ -9,7 +9,8 @@ def load_llm():
     model = AutoModelForCausalLM.from_pretrained(
             "context-labs/meta-llama-Llama-3.2-3B-Instruct-FP16",
             torch_dtype=torch.float16,
-            device_map="auto" if device == 0 else "cpu"
+            device_map="auto" if device == 0 else "cpu",
+            offload_folder="offload",
             )
 
     pipe = pipeline(

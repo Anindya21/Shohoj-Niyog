@@ -1,9 +1,9 @@
-from graph.schema import CandidateGraphState
+from logics.graph.schema import CandidateGraphState
 from sentence_transformers import SentenceTransformer
 from scipy.spatial import distance
 
-# Load model once globally (so it doesn’t reload every function call)
-model = SentenceTransformer('all-MiniLM-L6-v2')
+
+model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
 
 def validate_answer_node(state: CandidateGraphState) -> CandidateGraphState:
     transcribed_text = state.get('transcribed_text', [])

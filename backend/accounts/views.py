@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import RegisterSerializer
 from .models import CustomUser
-from db.mongo import get_db_handle
+from logics.db.mongo import get_db_handle
 import os
 # Create your views here.
 

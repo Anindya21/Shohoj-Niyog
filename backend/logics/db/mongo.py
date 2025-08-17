@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 import os 
-from utils.env_loader import load_env
+from logics.utils.env_loader import load_env
 import dns.resolver
 
 dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)

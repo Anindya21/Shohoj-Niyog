@@ -1,7 +1,7 @@
-from llm.model import load_llm
-from llm.prompts import SYSTEM_PROMPTS
-from utils.extract import extract_json_array
-from graph.schema import RecruiterGraphState
+from logics.llm.model import load_llm
+from logics.llm.prompts import SYSTEM_PROMPTS
+from logics.utils.extract import extract_json_array
+from logics.graph.schema import RecruiterGraphState
 from functools import lru_cache
 ##agents/ques_ans_gen.py
 

@@ -1,14 +1,14 @@
 ##graph/builder.py
 
 from langgraph.graph import StateGraph, END
-from agents.recruiter.ques_ans_gen import generate_question_and_answer_node 
-from agents.recruiter.save_to_db import save_qa_pairs_node
+from logics.agents.recruiter.ques_ans_gen import generate_question_and_answer_node 
+from logics.agents.recruiter.save_to_db import save_qa_pairs_node
 
-from agents.candidate.load_qa import load_qa_node
-from agents.candidate.transcribe_answer import transcribe_answer_node
-from agents.candidate.validate_answer import validate_answer_node
-from agents.candidate.save_response import save_response_node
-from graph.schema import RecruiterGraphState, CandidateGraphState
+from logics.agents.candidate.load_qa import load_qa_node
+from logics.agents.candidate.transcribe_answer import transcribe_answer_node
+from logics.agents.candidate.validate_answer import validate_answer_node
+from logics.agents.candidate.save_response import save_response_node
+from logics.graph.schema import RecruiterGraphState, CandidateGraphState
 
 
 def build_recruiter_graph():

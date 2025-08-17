@@ -1,4 +1,4 @@
-from graph.schema import CandidateGraphState
+from logics.graph.schema import CandidateGraphState
 import datetime
 import whisper
 

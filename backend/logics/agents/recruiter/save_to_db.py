@@ -2,8 +2,8 @@ import uuid
 import os
 from bson import ObjectId
 from datetime import datetime,timezone
-from db.mongo import get_db_handle
-from graph.schema import RecruiterGraphState
+from logics.db.mongo import get_db_handle
+from logics.graph.schema import RecruiterGraphState
 
 
 def save_qa_pairs_node(state: RecruiterGraphState)-> RecruiterGraphState:
@@ -29,7 +29,8 @@ def save_qa_pairs_node(state: RecruiterGraphState)-> RecruiterGraphState:
             "question_count": len(qa_pairs),
             "allowed_candidates": state["allowed_candidates"],
             "created": datetime.now(timezone.utc),
-            "scheduled": state["scheduled"]  # Add created timestamp
+            "scheduled": state["scheduled"],
+            "status": "pending" 
         }
         
     inserted_rec= collection.insert_one(document)    

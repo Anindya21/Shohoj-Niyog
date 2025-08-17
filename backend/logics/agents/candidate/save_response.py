@@ -1,5 +1,5 @@
-from graph.schema import CandidateGraphState
-from db.mongo import get_db_handle
+from logics.graph.schema import CandidateGraphState
+from logics.db.mongo import get_db_handle
 from datetime import datetime,timezone
 import os
 
