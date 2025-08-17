@@ -37,19 +37,19 @@ The project backend is built with **Django** + **Django REST Framework**, with *
 ### 1️⃣ Clone the Repository
 ```bash
 git clone https://github.com/Anindya21/Shohoj-Niyog.git
-cd Shohoj-Niyog
+cd backend
 ```
 
 ### 2️⃣ Create a Virtual Environment & Activate
 ```bash
-python -m venv .venv
+uv venv
 source .venv/bin/activate   # Linux/Mac
 .venv\Scripts\activate      # Windows
 ```
 
 ### 3️⃣ Install Dependencies
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 ### 4️⃣ Set Environment Variables
@@ -85,7 +85,7 @@ http://127.0.0.1:8000/
 
 ### Recruiter
 - **Create Interview Session** – `POST /api/gen` *(Authenticated, Role: Recruiter)*
-- **Get All Sessions** – `GET /api/findall/`
+- **Get All Sessions(Recruiter/Candidate)** – `GET /api/findall/`
 - **Update Candidate Status** – `PATCH /api/update_status/`
 
 ### Candidate
@@ -98,7 +98,7 @@ http://127.0.0.1:8000/
 
 1. **Sign up** as Recruiter or Candidate.
 2. **Recruiter logs in** and creates an interview session with position, stacks, level, allowed candidates, and number of questions.
-3. **AI generates questions** and stores them in the session.
+3. **AI generates questions** and stores them as a session.
 4. **Candidates log in** and submit video answers for each question.
 5. **AI transcribes and scores** answers against ideal answers.
 6. **Recruiter updates hiring status** for candidates.
@@ -108,4 +108,5 @@ http://127.0.0.1:8000/
 
 ## 📜 License
 This project is licensed under the MIT License.
+
 
