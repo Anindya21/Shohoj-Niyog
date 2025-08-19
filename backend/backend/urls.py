@@ -18,15 +18,11 @@ from django.views.generic import RedirectView
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
-from .views import home_view
 from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),  # Include the API URLs
-    # path('', home_view, name='home'),
+    path('api/', include('api.urls')), 
     path("accounts/", include("accounts.urls")),
-    path('', RedirectView.as_view(url='api/', permanent = True))
-    # path("accounts/", lambda request: redirect('login'))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
