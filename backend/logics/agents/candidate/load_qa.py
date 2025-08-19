@@ -33,6 +33,7 @@ def load_qa_node(state: CandidateGraphState) -> CandidateGraphState:
         question_data = []
     
         qa_pairs = session.get("qa_pairs", [])
+        position = session.get("position", "")
 
         for qa in qa_pairs:
             question_data.append({
@@ -46,6 +47,7 @@ def load_qa_node(state: CandidateGraphState) -> CandidateGraphState:
         return{
             **state,
             "question_answer_pair": question_data,
+            "position": position,
 
         }
 

@@ -19,6 +19,7 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
         candidate_id = state.get("candidate_id")
         candidate_mail = state.get("candidate_mail", None)
         candidate_name = state.get("candidate_name", None)
+        position = state.get("position", None)
 
         if not interview_id or not candidate_id:
             print("No interview ID or candidate ID provided.")
@@ -44,6 +45,7 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
         
         result= can_col.insert_one({
             "session_id": interview_id,
+            "position":position,
             "candidate_id": candidate_id,
             "candidate_name": candidate_name,
             "candidate_mail": candidate_mail,

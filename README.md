@@ -1,6 +1,6 @@
 # Shohoj Niyog
 
-Shohoj Niyog is a **AI–powered full-stack recruitment platform** where recruiters can create AI-generated interview sessions, invite candidates, and evaluate their responses automatically using semantic similarity scoring.
+Shohoj Niyog is an **AI–powered full-stack recruitment platform** where recruiters can create AI-generated interview sessions, invite candidates, and evaluate their responses automatically using semantic similarity scoring.
 
 The project backend is built with **Django** + **Django REST Framework**, with **LangGraph** for agentic workflows and **HuggingFacePipeline** for AI-powered interview question generation.
 

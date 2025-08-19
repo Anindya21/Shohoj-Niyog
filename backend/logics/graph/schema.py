@@ -15,6 +15,7 @@ class RecruiterGraphState(TypedDict):
 class CandidateGraphState(TypedDict):
     interview_id: str
     candidate_id: str
+    position:str
     candidate_mail: Optional[str]
     candidate_name: Optional[str]
     video_files: List[str]

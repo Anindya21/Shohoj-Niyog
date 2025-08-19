@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import QAPair
-from .serializers import MongoQuestionPullSerializer, MongoQuestionSerializer, CandidateSessionsSerializer
+from .serializers import MongoQuestionPullSerializer, MongoQuestionSerializer, CandidateSessionsSerializer, CandidateResultSerializer, CandidateOwnResultSerializer
 from logics.db.mongo import get_db_handle
 from logics.graph.builder import build_recruiter_graph, build_candidate_graph
 from logics.utils.env_loader import load_env
@@ -10,7 +10,6 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from typing import Dict, Any, Optional
 from django.utils import timezone
-# from datetime import datetime,timezone  
 import os, uuid, logging, mimetypes, tempfile
 from rest_framework import status
 
@@ -88,9 +87,6 @@ def get_allqa(request, requested_id):  ## To Display All Questions and Answers
     
     user_id= str(user.id)
 
-
-    
-
     docs= list(collection.find({'created_by': user_id}))
     
     for doc in docs:
@@ -126,14 +122,12 @@ def get_single_question(request, requested_id):   ## To Display Single Question 
     serializer = MongoQuestionSerializer(qa_pairs, many=True)
     return Response(serializer.data)
 
-# =============================== Candidate =========================================
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def validate_candidate(request):
 
     user = request.user
-
     session_id = request.data.get('session_id')
     user_id = str(user.id)
 
@@ -170,7 +164,6 @@ def user_response(request):
     session_id = request.data.get("session_id")
     user_name = user.get_full_name() or user.username
 
-    
     if not session_id:
         return Response({"error": "session_id is required."}, status=400)
     
@@ -180,7 +173,6 @@ def user_response(request):
     uri = os.getenv("mongo_uri")
     db, _ = get_db_handle("interview_db")
     qa_col = db['qa_pairs']
-
 
     allowed_candidates= qa_col.find_one({'_id': ObjectId(session_id)}).get('allowed_candidates', [])
 
@@ -193,11 +185,9 @@ def user_response(request):
     if not video_files:
         return Response({"error": "video_files is required."}, status=400)
     
-
     temp_video_paths = []
 
     try:
-
         for i, video_file in enumerate(video_files):
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as temp_file:
                 for chunk in video_file.chunks():
@@ -241,4 +231,53 @@ def user_response(request):
         for temp_path in temp_video_paths:
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
+
+
+# Recruiter session result views
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_session_results(request, session_id):
+
+    if not session_id:
+        return Response({"error": "session_id is required."}, status=400)
+    
+    user=request.user
+
+    uri = os.getenv("mongo_uri")
+    db, _ = get_db_handle("interview_db")
+    collection = db["user_db"]
+
+    try:
+        docs = list(collection.find({"session_id": session_id}))
+        print(docs)
+        for doc in docs:
+            doc['_id'] = str(doc['_id'])
+            doc['session_id'] = str(doc['session_id'])
+            doc['candidate_id'] = str(doc['candidate_id'])
+            for response in doc.get('responses', []):
+                response['question_id'] = str(response['question_id'])
+
+    except:
+        return Response({"error": "No results found for this session."}, status=404)
+
+    if user.role!='interviewer':
+        
+        serializer = CandidateOwnResultSerializer(docs, many=True)
+
+        if not serializer.data:
+            return Response({"message": "Empty Serializer Data."}, status=404)
+
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
+    serializer= CandidateResultSerializer(docs, many=True)
+    return Response(serializer.data, status= status.HTTP_200_OK)
+
+    
+    
+    
+
+
 

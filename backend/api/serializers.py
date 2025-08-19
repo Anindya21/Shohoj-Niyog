@@ -20,7 +20,24 @@ class MongoQuestionSerializer(serializers.Serializer):
 
 class CandidateSessionsSerializer(serializers.Serializer):
     session_id = serializers.CharField(source='_id')
-    position= serializers.CharField()
+    position= serializers.CharField(required=False, allow_null=True, default=None)
+
+class CandidateScoreSerializer(serializers.Serializer):
+    question_id= serializers.CharField()
+    given_answer = serializers.CharField()
+    score = serializers.FloatField()
+class CandidateResultSerializer(serializers.Serializer):
+    id= serializers.CharField(source='_id')
+    session_id = serializers.CharField()
+    candidate_id = serializers.CharField()
+    candidate_name = serializers.CharField()
+    candidate_mail = serializers.EmailField()
+    responses = serializers.ListField(child=CandidateScoreSerializer())
+    total_score = serializers.FloatField()
+    decision = serializers.CharField()
+
+class CandidateOwnResultSerializer(CandidateSessionsSerializer):
+    decision = serializers.CharField()
 
 
 
