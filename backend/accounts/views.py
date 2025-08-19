@@ -91,15 +91,58 @@ def login_user(request):
     if user is not None:
         refresh = RefreshToken.for_user(user)
     
+    else:
+        return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    if user.role =="candidate":
+        uri = os.getenv("mongo_uri")
+        db, _ = get_db_handle("interview_db")
+        collection = db['qa_pairs']
+
+        sessions_with_email = list(collection.find({"allowed_candidates": email}))
+    
+        print(f"Found {len(sessions_with_email)} sessions for this candidate")
+    
+        if not sessions_with_email:
+            return Response({
+                "access": str(refresh.access_token),
+                "refresh":str(refresh),
+                "username": user.username,
+                "role": user.role,
+                "user_id": user.id
+                })
+        
+        for session in sessions_with_email:
+            session_id = session['_id']
+            current_candidates = session['allowed_candidates']
+        
+        # Replace the email with user_id in the candidates list
+            updated_candidates = [
+            str(user.id) if candidate == email else candidate 
+            for candidate in current_candidates
+            ]
+        
+        # Update the session with new candidates list
+            result = collection.update_one(
+            {"_id": session_id},
+            {"$set": {"allowed_candidates": updated_candidates}}
+            )
+
         return Response({
             "access": str(refresh.access_token),
             "refresh":str(refresh),
             "username": user.username,
             "role": user.role,
-            "user_id": user.id
+            "user_id": user.id,
             })
     else:
-        return Response({"detail":"Invalid Credential"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "username": user.username,
+            "role": user.role,
+            "user_id": user.id
+        })
     
 
     
