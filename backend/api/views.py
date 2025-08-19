@@ -17,11 +17,10 @@ load_env()
 
 logger = logging.getLogger(__name__)
 
-##backend/api/views.py
 recruiter_graph= build_recruiter_graph()
 candidate_graph= build_candidate_graph()
 
-#================================== Interviewer =======================================
+## Interview Session Generation API View
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -58,8 +57,9 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
                      "Session_ID": result["interview_id"], 
                      "Created_By": str(user.id)}, 
                      status=status.HTTP_201_CREATED)
-# ===================================================================================================
 
+
+## Api View For Recruiter: Show ALL the Sessions and Details, Candidate: Views the Sessions Assigned to them
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -154,6 +154,8 @@ def validate_candidate(request):
     return Response({"status": "Authorized", "message": "Welcome to the interview session."})
 
 
+## Candidate Response API View
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def user_response(request):
@@ -193,8 +195,7 @@ def user_response(request):
                 for chunk in video_file.chunks():
                     temp_file.write(chunk)
                 temp_video_paths.append(temp_file.name)
-
-        
+      
         inputs= {
             "interview_id": session_id,
             "candidate_id": user_id,
@@ -219,8 +220,8 @@ def user_response(request):
 
             }, status=status.HTTP_201_CREATED)
             
-        else:
-            return Response({"error": "Failed to save responses"}, status=500)
+        # else:
+        #     return Response({"error": "Failed to save responses"}, status=500)
         
 
     except Exception as e:
@@ -233,7 +234,7 @@ def user_response(request):
                 os.unlink(temp_path)
 
 
-# Recruiter session result views
+# Session Results View for both Candidate and Recruiter
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -275,7 +276,76 @@ def get_session_results(request, session_id):
     serializer= CandidateResultSerializer(docs, many=True)
     return Response(serializer.data, status= status.HTTP_200_OK)
 
+## Hiring Decision API View Recruiter: Can Show interest in a candidate,
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def hiring_decision(request):
+    user = request.user
+    session_id = request.data.get('session_id')
+    candidate_id = request.data.get('candidate_id')
+    decision= request.data.get('decision')
+
+    if not session_id or not candidate_id:
+        return Response({"error": "session_id and candidate_id are required."}, status=400)
     
+    if decision not in ["interested","not_interested", "accept","reject"]:
+            return Response({"error": "decision must be 'interested','not_interested', 'accept' or 'reject'."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    uri = os.getenv("mongo_uri")
+    db, _ = get_db_handle("interview_db")
+    collection = db['user_db']
+
+    if user.role != "candidate":
+        
+        if decision not in ["interested", "not_interested"]:
+            return Response({"error": "Your only option as a recruiter is interested or not interested."}, status=403)
+        
+        responses = collection.find_one( {"session_id": session_id, "candidate_id": candidate_id})
+
+        if not responses:
+            return Response("No responses found for this session and candidate.", status=404)
+        
+    
+        result =  collection.update_one(
+            {"session_id":session_id, "candidate_id": candidate_id},
+            {"$set": {"decision": decision}}
+        )
+        
+        return Response(
+            {"message": f"Successfully updated the hiring decision for the candidate {candidate_id} in session {session_id}."},
+        )
+
+    if user.role == "candidate":
+
+        if decision not in ["accept", "reject"]:
+            return Response({"error": "Your only option as a candidate is accept or reject."}, status=status.HTTP_403_FORBIDDEN)
+        
+
+        responses = collection.find_one({"session_id": session_id, "candidate_id": candidate_id})
+
+        if not responses:
+            return Response("No responses found for this session and candidate.", status=404)
+        
+        rec_decision = responses.get("decision")
+
+        if rec_decision is "pending":
+            return Response({"message": "Your interview is still under review by the recruiter."}, status=status.HTTP_200_OK)
+        
+        elif rec_decision == "interested" and decision == "accept":
+            return Response({"message": f"Congratulations! You have made your decision to {decision} the offer."}, status=status.HTTP_200_OK)
+
+        elif rec_decision == "interested" and decision == "reject":
+            return Response({"message": f"You have decided to {decision} the offer. Thank you for your time."}, status=status.HTTP_200_OK)
+        
+        elif rec_decision == "not_interested":
+            return Response({"message": "Sorry, you couldn't match our vibe. Wish you all the best!"}, status=status.HTTP_200_OK)
+        
+        
+
+
+
+
+        
     
     
 
