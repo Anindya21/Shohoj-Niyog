@@ -328,20 +328,29 @@ def hiring_decision(request):
         
         rec_decision = responses.get("decision")
 
-        if rec_decision is "pending":
+        if rec_decision=="pending":
             return Response({"message": "Your interview is still under review by the recruiter."}, status=status.HTTP_200_OK)
         
         elif rec_decision == "interested" and decision == "accept":
+            
+            result = collection.update_one(
+                {"session_id":session_id, "candidate_id": candidate_id},
+                {"$set": {"decision": decision}}
+                )
+            
+            print(result)
             return Response({"message": f"Congratulations! You have made your decision to {decision} the offer."}, status=status.HTTP_200_OK)
 
         elif rec_decision == "interested" and decision == "reject":
+            result = collection.update_one(
+                {"session_id":session_id, "candidate_id": candidate_id},
+                {"$set": {"decision": decision}}
+                )
+
             return Response({"message": f"You have decided to {decision} the offer. Thank you for your time."}, status=status.HTTP_200_OK)
         
         elif rec_decision == "not_interested":
             return Response({"message": "Sorry, you couldn't match our vibe. Wish you all the best!"}, status=status.HTTP_200_OK)
-        
-        
-
 
 
 
