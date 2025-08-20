@@ -28,7 +28,9 @@ The project backend is built with **Django** + **Django REST Framework**, with *
 - MongoDB (Data storage)
 
 **Other Tools:**
+- Llama-3.2-3B (for QA generation)
 - Whisper (for video transcription)
+- 
 - JWT Authentication
 ---
 
@@ -37,7 +39,6 @@ The project backend is built with **Django** + **Django REST Framework**, with *
 ### 1️⃣ Clone the Repository
 ```bash
 git clone https://github.com/Anindya21/Shohoj-Niyog.git
-cd backend
 ```
 
 ### 2️⃣ Create a Virtual Environment & Activate
@@ -63,6 +64,7 @@ HUGGINGFACE_API_KEY=your_huggingface_api_key
 
 ### 5️⃣ Run Database Migrations
 ```bash
+cd backend
 python manage.py migrate
 ```
 
@@ -80,17 +82,18 @@ http://127.0.0.1:8000/
 ## 🔗 API Endpoints
 
 ### Authentication
-- **Sign Up** – `POST /accounts/signup`
-- **Login** – `POST /accounts/login`
+- **Sign Up** – `POST /accounts/signup/`
+- **Login** – `POST /accounts/login/`
 
 ### Recruiter
-- **Create Interview Session** – `POST /api/gen` *(Authenticated, Role: Recruiter)*
+- **Create Interview Session** – `POST /api/gen/` *(Authenticated, Role: Recruiter)*
 - **Get All Sessions(Recruiter/Candidate)** – `GET /api/findall/`
-- **Update Candidate Status** – `PATCH /api/update_status/`
+- **Update Hiring Status** – `PATCH /api/decide/`
 
 ### Candidate
-- **Submit Video Responses** – `POST /response/`
-- **View Interview Status** – `GET /status/`
+- **Submit Video Responses** – `POST /api/response/`
+- **View Interview Status** – `GET /api/results/`
+- **Joining Confirmation**- `POST /api/decide`
 
 ---
 
@@ -98,11 +101,11 @@ http://127.0.0.1:8000/
 
 1. **Sign up** as Recruiter or Candidate.
 2. **Recruiter logs in** and creates an interview session with position, stacks, level, allowed candidates, and number of questions.
-3. **AI generates questions** and stores them as a session.
+3. **AI generates** questions and ideal answers stores them as a session.
 4. **Candidates log in** and submit video answers for each question.
 5. **AI transcribes and scores** answers against ideal answers.
 6. **Recruiter updates hiring status** for candidates.
-7. **Candidates check their results** in the dashboard.
+7. **Candidates checks and confirms hiring decision** in the dashboard.
 
 ---
 
