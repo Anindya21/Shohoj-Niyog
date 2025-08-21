@@ -63,10 +63,10 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_allqa(request, requested_id):  ## To Display All Questions and Answers
+def get_allqa(request):  ## To Display All Questions and Answers
     
     user= request.user               
-    
+    print(user.id)
     uri = os.getenv("mongo_uri")
     db, _ = get_db_handle("interview_db")
     collection = db['qa_pairs']
@@ -98,19 +98,33 @@ def get_allqa(request, requested_id):  ## To Display All Questions and Answers
 
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-def get_single_question(request, requested_id):   ## To Display Single Question and Answers
+@permission_classes([IsAuthenticated])
+def get_single_question(request, session_id):   ## To Display Single Question and Answers
     
-    # user= request.user               
+    user= request.user               
     
-    # if user.role == "candidate":
-    #     return Response({"message": "Unauthorized Action"}, status=403)
     uri = os.getenv("mongo_uri")
     db, _ = get_db_handle("interview_db")
     collection = db['qa_pairs']
 
+    if user.role !="candidate":
+        try:
+            docs= collection.find_one({'_id': ObjectId(session_id)})
+        except Exception as e:
+            return Response({"error": "Invalid ID format."}, status=400)
+        
+        if not docs:
+            return Response({"error": "Document not found."}, status=404)
+        
+        docs['_id'] = str(docs['_id'])
+
+        serializer= MongoQuestionPullSerializer(docs, many=False)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
     try:
-        docs= collection.find_one({'_id': ObjectId(requested_id)})
+        docs= collection.find_one({'_id': ObjectId(session_id)})
     except Exception as e:
         return Response({"error": "Invalid ID format."}, status=400)
     
@@ -120,7 +134,7 @@ def get_single_question(request, requested_id):   ## To Display Single Question 
     qa_pairs = docs.get("qa_pairs", [])
 
     serializer = MongoQuestionSerializer(qa_pairs, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

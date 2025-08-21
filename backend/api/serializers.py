@@ -13,6 +13,7 @@ class MongoQuestionPullSerializer(serializers.Serializer):
     level = serializers.CharField()
     qa_pairs = serializers.ListField(child=QAPairSerializer()) 
     allowed_candidates = serializers.ListField(child=serializers.EmailField(), required=False)
+    scheduled_time = serializers.DateTimeField(source="scheduled",required=False, allow_null=True)
 
 class MongoQuestionSerializer(serializers.Serializer):
     question = serializers.CharField()
