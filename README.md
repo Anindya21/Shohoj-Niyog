@@ -93,7 +93,7 @@ http://127.0.0.1:8000/
 ### Candidate
 - **Submit Video Responses** – `POST /api/response/`
 - **View Interview Status** – `GET /api/results/`
-- **Joining Confirmation**- `POST /api/decide`
+- **Joining Confirmation**- `POST /api/decide/`
 
 ---
 
