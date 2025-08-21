@@ -30,7 +30,7 @@ The project backend is built with **Django** + **Django REST Framework**, with *
 **Other Tools:**
 - Llama-3.2-3B (for QA generation)
 - Whisper (for video transcription)
-- 
+- all-MiniLM-L6-v2 (for semantic similarity)
 - JWT Authentication
 ---
 
