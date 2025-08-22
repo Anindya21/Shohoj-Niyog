@@ -17,11 +17,10 @@ class MongoQuestionPullSerializer(serializers.Serializer):
 
 class MongoQuestionSerializer(serializers.Serializer):
     question = serializers.CharField()
-
-
 class CandidateSessionsSerializer(serializers.Serializer):
     session_id = serializers.CharField(source='_id')
     position= serializers.CharField(required=False, allow_null=True, default=None)
+    scheduled_time = serializers.DateTimeField(source="scheduled",required=False, allow_null=True)
 
 class CandidateScoreSerializer(serializers.Serializer):
     question_id= serializers.CharField()
@@ -40,18 +39,5 @@ class CandidateResultSerializer(serializers.Serializer):
 class CandidateOwnResultSerializer(CandidateSessionsSerializer):
     decision = serializers.CharField()
 
-
-
-
-
-# class VideoSerializer(serializers.Serializer):
-#     video_file= serializers.FileField(upload_to ='res/')
-
-
-# class TranscriptionSerializer(serializers.Serializer):
-#     video_files = serializers.ListField(child=VideoSerializer())
-#     trnscribed_text= serializers.ListField(child=serializers.CharField())
-#     session_id = serializers.CharField()
-#     candidate_id = serializers.CharField()
 
     

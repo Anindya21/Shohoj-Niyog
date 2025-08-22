@@ -58,7 +58,6 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
                      "Created_By": str(user.id)}, 
                      status=status.HTTP_201_CREATED)
 
-
 ## Api View For Recruiter: Show ALL the Sessions and Details, Candidate: Views the Sessions Assigned to them
 
 @api_view(['GET'])
@@ -189,12 +188,18 @@ def user_response(request):
     uri = os.getenv("mongo_uri")
     db, _ = get_db_handle("interview_db")
     qa_col = db['qa_pairs']
+    user_col = db['user_db']
 
     allowed_candidates= qa_col.find_one({'_id': ObjectId(session_id)}).get('allowed_candidates', [])
 
     if user_id not in allowed_candidates:
         return Response({"error": "You are not allowed to join this session."}, status=403)
     
+    prev_response= user_col.find_one({'session_id': ObjectId(session_id), 'candidate_id': user_id})
+
+    if prev_response is not None:
+        return Response({"message": "You have already submitted your responses for this session."}, status=status.HTTP_403_FORBIDDEN)
+
 
     video_files = request.FILES.getlist("video")
 
@@ -234,8 +239,7 @@ def user_response(request):
 
             }, status=status.HTTP_201_CREATED)
             
-        # else:
-        #     return Response({"error": "Failed to save responses"}, status=500)
+        return Response({"error": "Failed to save responses"}, status=500)
         
 
     except Exception as e:
