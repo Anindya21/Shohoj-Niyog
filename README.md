@@ -28,9 +28,9 @@ The project backend is built with **Django** + **Django REST Framework**, with *
 - MongoDB (Data storage)
 
 **Other Tools:**
-- Llama-3.2-3B (for QA generation)
+- Llama-3.2-3B (for interview session generation)
 - Whisper (for video transcription)
-- all-MiniLM-L6-v2 (for semantic similarity)
+- all-MiniLM-L6-v2 (for semantic similarity analysis)
 - JWT Authentication
 ---
 

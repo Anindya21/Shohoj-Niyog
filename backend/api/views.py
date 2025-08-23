@@ -241,11 +241,9 @@ def user_response(request):
             
         return Response({"error": "Failed to save responses"}, status=500)
         
-
     except Exception as e:
         return Response({"error": str(e)}, status=500)
     
-
     finally:
         for temp_path in temp_video_paths:
             if os.path.exists(temp_path):
