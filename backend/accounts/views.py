@@ -81,6 +81,7 @@ def register_user(request):
         "assigned_sessions": session_details
     }, status=status.HTTP_201_CREATED)
 
+
 @api_view(['POST'])
 def login_user(request):
     email= request.data.get("email")

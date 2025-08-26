@@ -1,0 +1,28 @@
+# version: "3.9"   # should be 3.9, not "3.11"
+
+services:
+  backend:
+    build: .
+    container_name: backend
+    command: gunicorn --bind 0.0.0.0:8000 backend.wsgi:application
+    volumes:
+      - .:/backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=${mongo_uri}   # pick from .env
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+# ✅ Volumes must be defined here, not inside services
+volumes:
+  mongo_data:
