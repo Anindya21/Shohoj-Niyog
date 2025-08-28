@@ -14,7 +14,9 @@ WORKDIR /app
 COPY uv.lock pyproject.toml ./
 
 # Install dependencies in a venv
-RUN uv sync
+RUN uv venv /app/.venv \
+    && uv pip install -e . --no-cache-dir \
+    && uv pip install gunicorn --no-cache-dir
 
 # 2nd stage: Runtime
 FROM python:3.11.9-slim
@@ -22,17 +24,19 @@ FROM python:3.11.9-slim
 WORKDIR /app
 
 # Copy installed venv from builder
-COPY --from=builder /app/.venv .venv
+COPY --from=builder /app/.venv /app/.venv
 
-ENV PATH="/app/.venv/bin:$PATH"
+ENV VIRTUAL_ENV=/app/.venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Copy project files
 COPY . .
 
-# Collect Django static files (optional, skip if it fails)
-RUN python manage.py collectstatic --noinput || true
+# Collect Django static files (ignore failure)
+RUN python backend/manage.py collectstatic --noinput || true
 
-# Expose port
+RUN which gunicorn && gunicorn --version
+
 EXPOSE 8000
 
 # Run Gunicorn server

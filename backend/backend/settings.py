@@ -32,9 +32,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = env("SECRET_KEY")
 
-DEBUG = env("DEBUG")
+# DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+# ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
 # Example: Mongo or Postgres config (optional)
 # MONGO_USER = env("mongo_user")
@@ -43,9 +43,9 @@ ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 # MONGO_PORT = os.getenv("port")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
+DEBUG = True
 
-# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 
 
 # Application definition
