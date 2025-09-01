@@ -10,7 +10,7 @@ wheels/
 *.pyc 
 *.sqlite3
 /media/
-
+test.py
 # Virtual environments
 .venv
 .env
