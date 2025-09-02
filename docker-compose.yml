@@ -1,11 +1,11 @@
 services:
   backend:
-    image: backend:fixed
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: backend
     command: ["gunicorn", "--bind", "0.0.0.0:8000", "backend.wsgi:application"]
-    volumes:
-      - .:/app                
-    working_dir: /app/backend 
+    working_dir: /app/backend
     ports:
       - "8000:8000"
     env_file:
