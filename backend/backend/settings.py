@@ -32,20 +32,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = env("SECRET_KEY")
 
-# DEBUG = env("DEBUG")
-
-# ALLOWED_HOSTS = env("ALLOWED_HOSTS")
-
-# Example: Mongo or Postgres config (optional)
-# MONGO_USER = env("mongo_user")
-# MONGO_PASS = env("mongo_pass")
-# MONGO_HOST = os.getenv("host")
-# MONGO_PORT = os.getenv("port")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 
 # Application definition
@@ -80,6 +71,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://vercel.com/",
 ]
 
 
