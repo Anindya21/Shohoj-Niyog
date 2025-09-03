@@ -7,11 +7,11 @@ class QAPairSerializer(serializers.Serializer):
 
 class MongoQuestionPullSerializer(serializers.Serializer):
     id= serializers.CharField(source='_id')
-    created_by = serializers.CharField(),
+    created_by = serializers.CharField()
     position = serializers.CharField()
     stack= serializers.CharField()
     level = serializers.CharField()
-    qa_pairs = serializers.ListField(child=QAPairSerializer()) 
+    qa_pairs = serializers.ListField(child=QAPairSerializer(),required=False, allow_null=True) 
     allowed_candidates = serializers.ListField(child=serializers.EmailField(), required=False)
     scheduled_time = serializers.DateTimeField(source="scheduled",required=False, allow_null=True)
 

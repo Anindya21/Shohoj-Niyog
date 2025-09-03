@@ -26,6 +26,29 @@ def get_recruiter_graph():
 def get_candidate_graph():
     return build_candidate_graph()
 
+def get_db():
+    db, _ = get_db_handle("interview_db")
+    return db
+
+def get_col(name):
+    return get_db()[name]
+
+def to_object_id(id_str):
+    if not ObjectId.is_valid(id_str):
+        raise InvalidId("Invalid ObjectId")
+    return ObjectId(id_str)
+
+def ensure_indexes():
+    try:
+        db = get_db()
+        db['qa_pairs'].create_index('created_by', background=True)
+        db['qa_pairs'].create_index('allowed_candidates', background=True)
+        db['user_db'].create_index([('session_id', 1), ('candidate_id', 1)], background=True)
+        db['user_db'].create_index('candidate_id', background=True)
+    except Exception:
+        logger.exception("Index ensure failed")
+
+ensure_indexes()
 
 ## Interview Session Generation API View
 
@@ -72,75 +95,78 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
 def get_allqa(request):  ## To Display All Questions and Answers
     
     user= request.user               
-    print(user.id)
-    uri = os.getenv("mongo_uri")
-    db, _ = get_db_handle("interview_db")
-    collection = db['qa_pairs']
+    collection = get_col('qa_pairs')
+
+    try:
+        limit= min(int(request.GET.get('limit',50)),200)
+        skip = max(int(request.GET.get('skip',0)),0)
+
+    except ValueError:
+        limit,skip= 50,0
 
     if user.role == "candidate":
 
         docs= list(collection.find(
             {"allowed_candidates": 
-             {"$in": [str(user.id), user.email]}
-             }))
+             {"$in": [str(user.id), user.email]}},
+             projection={'qa_pairs':0}
+             ).skip(skip).limit(limit)
+             )
 
         for doc in docs:
             doc['_id'] = str(doc['_id'])
         
         serializer= CandidateSessionsSerializer(docs, many=True)
         
-        return Response(serializer.data)
+        return Response(serializer.data, status= status.HTTP_200_OK)
     
     user_id= str(user.id)
 
-    docs= list(collection.find({'created_by': user_id}))
+    docs= list(collection.find(
+        {'created_by': user_id},
+        projection={'qa_pairs': 0}).skip(skip).limit(limit))
     
     for doc in docs:
         doc['_id'] = str(doc['_id'])
     
     serializer = MongoQuestionPullSerializer(docs, many=True)
     
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_single_question(request, session_id):   ## To Display Single Question and Answers
     
-    user= request.user               
-    
-    uri = os.getenv("mongo_uri")
-    db, _ = get_db_handle("interview_db")
-    collection = db['qa_pairs']
-
-    if user.role !="candidate":
-        try:
-            docs= collection.find_one({'_id': ObjectId(session_id)})
-        except Exception as e:
-            return Response({"error": "Invalid ID format."}, status=400)
-        
-        if not docs:
-            return Response({"error": "Document not found."}, status=404)
-        
-        docs['_id'] = str(docs['_id'])
-
-        serializer= MongoQuestionPullSerializer(docs, many=False)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
+    user= request.user 
+    collection= get_col('qa_pairs')
 
     try:
-        docs= collection.find_one({'_id': ObjectId(session_id)})
-    except Exception as e:
-        return Response({"error": "Invalid ID format."}, status=400)
-    
-    if not docs:
-        return Response({"error": "Document not found."}, status=404)
-    
-    qa_pairs = docs.get("qa_pairs", [])
+        oid = to_object_id(session_id)
+    except InvalidId:
+        return Response({"error": "Invalid ID format."}, status=status.HTTP_400_BAD_REQUEST)
 
-    serializer = MongoQuestionSerializer(qa_pairs, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    if user.role !="candidate":
+        docs= collection.find_one({'_id': oid})
+        
+        if not docs:
+            return Response({"error": "Document not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        docs['_id'] = str(docs['_id'])
+        serializer= MongoQuestionPullSerializer(docs, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    else:
+        docs= collection.find_one({'_id':oid}, projection= {'qa_pairs':1, '_id':0})
+        if not docs:
+            return Response({"error": "Document not found"}, status=status.HTTP_404_NOT_FOUND)
+         
+        qa_pairs = docs.get("qa_pairs", [])
+
+        serializer = MongoQuestionSerializer(qa_pairs, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -181,37 +207,46 @@ def validate_candidate(request):
 def user_response(request):
     user = request.user
 
+    if user.role != "candidate":
+        return Response({"message": "You Must be a candidate to join an interview"}, status=status.HTTP_403_FORBIDDEN)
+    
     user_id = str(user.id)
     user_mail = user.email
     session_id = request.data.get("session_id")
     user_name = user.get_full_name() or user.username
 
     if not session_id:
-        return Response({"error": "session_id is required."}, status=400)
+        return Response({"error": "session_id is required."}, status=status.HTTP_400_BAD_REQUEST)
     
-    if user.role != "candidate":
-        return Response({"message": "You Must be a candidate to join an interview"}, status=status.HTTP_403_FORBIDDEN)
+    try:
+        session_oid = to_object_id(session_id)
+    except InvalidId:
+        return Response({"error": "Invalid session_id format."}, status=status.HTTP_400_BAD_REQUEST)
+
     
-    uri = os.getenv("mongo_uri")
-    db, _ = get_db_handle("interview_db")
-    qa_col = db['qa_pairs']
-    user_col = db['user_db']
+    qa_col = get_col('qa_pairs')
+    user_col = get_col('user_db')
 
-    allowed_candidates= qa_col.find_one({'_id': ObjectId(session_id)}).get('allowed_candidates', [])
 
-    if user_id not in allowed_candidates:
-        return Response({"error": "You are not allowed to join this session."}, status=403)
+    docs= qa_col.find_one({'_id': session_oid}, projection={'allowed_candidates': 1})
+    if not docs:
+        return Response({"error": "Session not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    allowed_candidates= set(docs.get('allowed_candidates',[]))
+
+    if user_id not in allowed_candidates and user_mail not in allowed_candidates:
+        return Response({"error": "You are not allowed to join this session."}, status=status.HTTP_403_FORBIDDEN)
     
-    prev_response= user_col.find_one({'session_id': ObjectId(session_id), 'candidate_id': user_id})
+    prev_response= user_col.find_one({'session_id': session_oid, 'candidate_id': user_id},projection={'_id': 1})
 
-    if prev_response is not None:
+    if prev_response:
         return Response({"message": "You have already submitted your responses for this session."}, status=status.HTTP_403_FORBIDDEN)
 
 
     video_files = request.FILES.getlist("video")
 
     if not video_files:
-        return Response({"error": "video_files is required."}, status=400)
+        return Response({"error": "video_files is required."}, status=status.HTTP_400_BAD_REQUEST)
     
     temp_video_paths = []
 
@@ -246,16 +281,19 @@ def user_response(request):
 
             }, status=status.HTTP_201_CREATED)
             
-        return Response({"error": "Failed to save responses"}, status=500)
+        return Response({"error": "Failed to save responses"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     except Exception as e:
-        return Response({"error": str(e)}, status=500)
+        logger.exception("user_response failed")
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     finally:
         for temp_path in temp_video_paths:
-            if os.path.exists(temp_path):
-                os.unlink(temp_path)
-
+            try:
+                if os.path.exists(temp_path):
+                    os.unlink(temp_path)
+            except Exception:
+                logger.warning("Temp cleanup failed for %s", temp_path)
 
 # Session Results View for both Candidate and Recruiter
 
@@ -264,13 +302,11 @@ def user_response(request):
 def get_session_results(request, session_id):
 
     if not session_id:
-        return Response({"error": "session_id is required."}, status=400)
+        return Response({"error": "session_id is required."}, status=status.HTTP_400_BAD_REQUEST)
     
     user=request.user
 
-    uri = os.getenv("mongo_uri")
-    db, _ = get_db_handle("interview_db")
-    collection = db["user_db"]
+    collection = get_col("user_db")
 
     try:
         docs = list(collection.find({"session_id": session_id}))
@@ -283,14 +319,14 @@ def get_session_results(request, session_id):
                 response['question_id'] = str(response['question_id'])
 
     except:
-        return Response({"error": "No results found for this session."}, status=404)
+        return Response({"error": "No results found for this session."}, status=status.HTTP_404_NOT_FOUND)
 
     if user.role!='interviewer':
         
         serializer = CandidateOwnResultSerializer(docs, many=True)
 
         if not serializer.data:
-            return Response({"message": "Empty Serializer Data."}, status=404)
+            return Response({"message": "Empty Serializer Data."}, status=status.HTTP_404_NOT_FOUND)
 
         
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -308,27 +344,26 @@ def hiring_decision(request):
     candidate_id = request.data.get('candidate_id')
     decision= request.data.get('decision')
 
-    if not session_id or not candidate_id:
-        return Response({"error": "session_id and candidate_id are required."}, status=400)
+    if not session_id or not candidate_id or not decision:
+        return Response({"error": "session_id, candidate_id and decision are required."}, status=status.HTTP_400_BAD_REQUEST)
     
+
     if decision not in ["interested","not_interested", "accept","reject"]:
             return Response({"error": "decision must be 'interested','not_interested', 'accept' or 'reject'."}, status=status.HTTP_400_BAD_REQUEST)
     
-    uri = os.getenv("mongo_uri")
-    db, _ = get_db_handle("interview_db")
-    collection = db['user_db']
+    collection = get_col('user_db')
 
     
     if user.role != "candidate":
         # Consider pending also 
         if decision not in ["interested", "not_interested"]:
-            return Response({"error": "Your only option as a recruiter is interested or not interested."}, status=403)
+            return Response({"error": "Your only option as a recruiter is interested or not interested."}, status=status.HTTP_400_BAD_REQUEST)
         
         
         responses = collection.find_one( {"session_id": str(session_id), "candidate_id": candidate_id})
 
         if not responses:
-            return Response("No responses found for this session and candidate.", status=404)
+            return Response("No responses found for this session and candidate.", status=status.HTTP_404_NOT_FOUND)
 
 
         result =  collection.update_one(
@@ -340,40 +375,40 @@ def hiring_decision(request):
             {"message": f"Successfully updated the hiring decision for the candidate {candidate_id} in session {session_id}."},
         )
 
-    if user.role == "candidate":
+    
 
-        if decision not in ["accept", "reject"]:
-            return Response({"error": "Your only option as a candidate is accept or reject."}, status=status.HTTP_403_FORBIDDEN)
+    if decision not in ["accept", "reject"]:
+        return Response({"error": "Your only option as a candidate is accept or reject."}, status=status.HTTP_403_FORBIDDEN)
         
-        responses = collection.find_one( {"session_id": str(session_id), "candidate_id": str(user.id)})
+    responses = collection.find_one( {"session_id": str(session_id), "candidate_id": str(user.id)})
 
-        if not responses:
-            return Response("No responses found for this session and candidate.", status=404)
+    if not responses:
+        return Response("No responses found for this session and candidate.", status=404)
 
-        rec_decision = responses.get("decision")
+    rec_decision = responses.get("decision")
 
-        if rec_decision=="pending":
-            return Response({"message": "Your interview is still under review by the recruiter."}, status=status.HTTP_200_OK)
+    if rec_decision=="pending":
+        return Response({"message": "Your interview is still under review by the recruiter."}, status=status.HTTP_200_OK)
         
-        elif rec_decision == "interested" and decision == "accept":
+    elif rec_decision == "interested" and decision == "accept":
             
-            result = collection.update_one(
-                {"session_id":str(session_id), "candidate_id": str(user.id)},
+        result = collection.update_one(
+            {"session_id":str(session_id), "candidate_id": str(user.id)},
                 {"$set": {"decision": decision}}
                 )
             
-            return Response({"message": f"Congratulations! You have made your decision to {decision} the offer."}, status=status.HTTP_200_OK)
+        return Response({"message": f"Congratulations! You have made your decision to {decision} the offer."}, status=status.HTTP_200_OK)
 
-        elif rec_decision == "interested" and decision == "reject":
-            result = collection.update_one(
+    elif rec_decision == "interested" and decision == "reject":
+        result = collection.update_one(
                 {"session_id":str(session_id), "candidate_id": str(user.id)},
                 {"$set": {"decision": decision}}
                 )
 
-            return Response({"message": f"You have decided to {decision} the offer. Thank you for your time."}, status=status.HTTP_200_OK)
+        return Response({"message": f"You have decided to {decision} the offer. Thank you for your time."}, status=status.HTTP_200_OK)
         
-        elif rec_decision == "not_interested":
-            return Response({"message": "Sorry, you couldn't match our vibe. Wish you all the best!"}, status=status.HTTP_200_OK)
+    elif rec_decision == "not_interested":
+        return Response({"message": "Sorry, you couldn't match our vibe. Wish you all the best!"}, status=status.HTTP_200_OK)
 
 
 
