@@ -12,13 +12,20 @@ from typing import Dict, Any, Optional
 from django.utils import timezone
 import os, uuid, logging, mimetypes, tempfile
 from rest_framework import status
+from functools import lru_cache
 
 load_env()
 
 logger = logging.getLogger(__name__)
 
-recruiter_graph= build_recruiter_graph()
-candidate_graph= build_candidate_graph()
+@lru_cache(maxsize=1)
+def get_recruiter_graph():
+    return build_recruiter_graph()
+
+@lru_cache(maxsize=1)
+def get_candidate_graph():
+    return build_candidate_graph()
+
 
 ## Interview Session Generation API View
 
@@ -51,7 +58,7 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
             "scheduled":  scheduled
             }
     
-    result = recruiter_graph.invoke(inputs)
+    result = get_recruiter_graph().invoke(inputs)
 
     return Response({"status": "success", "message": "Questions and answers generated and saved.", 
                      "Session_ID": result["interview_id"], 
@@ -228,7 +235,7 @@ def user_response(request):
             "allowed_candidates": []
             }
         
-        result = candidate_graph.invoke(inputs)
+        result = get_candidate_graph().invoke(inputs)
 
         if result.get("responsed_id") is not None:
 
