@@ -35,6 +35,7 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
         for ques_data, given, score in zip(qa_pairs,transcribed_text, scores):
             responses.append(
                 {   "question_id": ques_data.get("question_id"),
+                    "ideal_answer": ques_data.get("answer"),
                     "given_answer": given,
                     "score": score
                 }
