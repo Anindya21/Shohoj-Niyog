@@ -57,7 +57,7 @@ uv sync
 Create a `.env` file in the root directory:
 ```env
 SECRET_KEY=your_django_secret_key
-DEBUG=True
+DEBUG=False
 mongo_uri=your_mongodb_connection_uri
 HUGGINGFACE_API_KEY=your_huggingface_api_key
 ```
