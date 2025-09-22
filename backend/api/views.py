@@ -280,8 +280,9 @@ def user_response(request):
                 "responsed_id": result.get("responsed_id")
 
             }, status=status.HTTP_201_CREATED)
-            
-        return Response({"error": "Failed to save responses"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        else:
+            return Response({"error": "Failed to save responses"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     except Exception as e:
         logger.exception("user_response failed")

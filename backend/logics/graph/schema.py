@@ -23,4 +23,5 @@ class CandidateGraphState(TypedDict):
     responses: List[str]
     question_answer_pairs: Optional[List[dict]]
     scores: Optional[List[float]]
+    responsed_id: Optional[str]
 
