@@ -264,7 +264,7 @@ def user_response(request):
             "candidate_mail": user_mail,
             "video_files": temp_video_paths,
             "transcribed_text": [],
-            "question_answer_pair": [],
+            "question_answer_pairs": [],
             "responses": [],
             "total_score": None,
             "allowed_candidates": []

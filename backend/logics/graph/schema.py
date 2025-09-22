@@ -21,6 +21,6 @@ class CandidateGraphState(TypedDict):
     video_files: List[str]
     transcribed_text: List[str]
     responses: List[str]
-    question_answer_pair: Optional[List[dict]]
+    question_answer_pairs: Optional[List[dict]]
     scores: Optional[List[float]]
 

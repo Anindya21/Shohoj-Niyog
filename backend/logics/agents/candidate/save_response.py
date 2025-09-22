@@ -12,7 +12,7 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
         can_col = db['user_db']
         rec_col = db["qa_pairs"]
 
-        qa_pairs = state.get("question_answer_pair", [])
+        qa_pairs = state.get("question_answer_pairs", [])
         transcribed_text = state.get("transcribed_text", [])
         scores= state.get("scores", [])
         interview_id = state.get("interview_id")
@@ -35,7 +35,7 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
         for ques_data, given, score in zip(qa_pairs,transcribed_text, scores):
             responses.append(
                 {   "question_id": ques_data.get("question_id"),
-                    "ideal_answer": ques_data.get("answer"),
+                    "ideal_answer": ques_data.get("expected_answer"),
                     "given_answer": given,
                     "score": score
                 }

@@ -13,7 +13,7 @@ def load_qa_node(state: CandidateGraphState) -> CandidateGraphState:
         print("No Session ID provided.")
         return {
             **state,
-            "question_answer_pair": []
+            "question_answer_pairs": []
         }
 
     try:
@@ -27,7 +27,7 @@ def load_qa_node(state: CandidateGraphState) -> CandidateGraphState:
             print(f"No interview Session found for {interview_id}")
             return {
                 **state,
-                "question_answer_pair": []
+                "question_answer_pairs": []
             }
         
         question_data = []
@@ -46,7 +46,7 @@ def load_qa_node(state: CandidateGraphState) -> CandidateGraphState:
 
         return{
             **state,
-            "question_answer_pair": question_data,
+            "question_answer_pairs": question_data,
             "position": position,
 
         }
@@ -55,5 +55,5 @@ def load_qa_node(state: CandidateGraphState) -> CandidateGraphState:
         print("Failed to load session data from MongoDB.")
         return{
             **state,
-            "question_answer_pair":[]
+            "question_answer_pairs":[]
         }

@@ -7,7 +7,9 @@ model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
 
 def validate_answer_node(state: CandidateGraphState) -> CandidateGraphState:
     transcribed_text = state.get('transcribed_text', [])
-    qa_pair = state.get('question_answer_pair', [])
+    qa_pair = state.get('question_answer_pairs', [])
+
+    print(qa_pair)
 
     if not transcribed_text or not qa_pair:
         print("No transcribed text or question-answer pairs provided.")
