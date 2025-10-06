@@ -58,6 +58,7 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
     
     user= request.user
     
+    print(user.company)
     if user.role == "candidate":
         return Response({"message": "Unauthorized Action"}, status=403)
     
@@ -67,7 +68,8 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
     allowed_candidates = request.data.get('allowed_candidates')
     num_questions= request.data.get('num_questions')
     scheduled= request.data.get('scheduled', timezone.now().isoformat())
-
+    company=user.company
+    
     if not position or not stacks or not level or not allowed_candidates:
         return Response({"error": "position, stacks, level, and allowed_candidates are required."}, status=400)
     
@@ -77,6 +79,7 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
             "level": level,
             "num_questions":num_questions,
             "allowed_candidates":allowed_candidates,
+            "company": str(company),
             "created_by": str(user.id),
             "scheduled":  scheduled
             }
@@ -85,7 +88,7 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
 
     return Response({"status": "success", "message": "Questions and answers generated and saved.", 
                      "Session_ID": result["interview_id"], 
-                     "Created_By": str(user.id)}, 
+                     "Company": str(company)}, 
                      status=status.HTTP_201_CREATED)
 
 ## Api View For Recruiter: Show ALL the Sessions and Details, Candidate: Views the Sessions Assigned to them
@@ -337,7 +340,7 @@ def get_session_results(request, session_id):
     return Response(serializer.data, status= status.HTTP_200_OK)
 
 ## Hiring Decision API View Recruiter: Can Show interest in a candidate,
-@api_view(['POST'])
+@api_view(['POST'])    ## Need to update this, PUT or PATCH
 @permission_classes([IsAuthenticated])
 def hiring_decision(request):
     user = request.user

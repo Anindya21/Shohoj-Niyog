@@ -11,6 +11,7 @@ class RecruiterGraphState(TypedDict):
     allowed_candidates: List[str]
     created_by: str
     scheduled: str
+    company: str
 
 class CandidateGraphState(TypedDict):
     interview_id: str

@@ -86,6 +86,7 @@ def register_user(request):
 def login_user(request):
     email= request.data.get("email")
     password= request.data.get("password")
+    company = request.data.get("company", None)
 
     user= authenticate(email=email, password=password)
 
@@ -100,7 +101,7 @@ def login_user(request):
         db, _ = get_db_handle("interview_db")
         collection = db['qa_pairs']
 
-        sessions_with_email = list(collection.find({"allowed_candidates": email}))
+        sessions_with_email = list(collection.find({"allowed_candidates": email}))  ## Need to fix this!!
     
         print(f"Found {len(sessions_with_email)} sessions for this candidate")
     
@@ -109,6 +110,7 @@ def login_user(request):
                 "access": str(refresh.access_token),
                 "refresh":str(refresh),
                 "username": user.username,
+                "company": str(company),
                 "role": user.role,
                 "user_id": user.id
                 })
@@ -133,6 +135,7 @@ def login_user(request):
             "access": str(refresh.access_token),
             "refresh":str(refresh),
             "username": user.username,
+            "company": str(company),
             "role": user.role,
             "user_id": user.id,
             })
@@ -141,6 +144,7 @@ def login_user(request):
             "access": str(refresh.access_token),
             "refresh": str(refresh),
             "username": user.username,
+            "company": str(user.company),
             "role": user.role,
             "user_id": user.id
         })
