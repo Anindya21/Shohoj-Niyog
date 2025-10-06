@@ -90,6 +90,10 @@ def login_user(request):
 
     user= authenticate(email=email, password=password)
 
+    uri = os.getenv("mongo_uri")
+    db, _ = get_db_handle("interview_db")
+    collection = db['qa_pairs']
+
     if user is not None:
         refresh = RefreshToken.for_user(user)
     
@@ -97,12 +101,9 @@ def login_user(request):
         return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
     
     if user.role =="candidate":
-        uri = os.getenv("mongo_uri")
-        db, _ = get_db_handle("interview_db")
-        collection = db['qa_pairs']
-
-        sessions_with_email = list(collection.find({"allowed_candidates": email}))  ## Need to fix this!!
-    
+        
+        sessions_with_email = list(collection.find( {"allowed_candidates": {"$in": [str(user.id), user.email]} } )) 
+             
         print(f"Found {len(sessions_with_email)} sessions for this candidate")
     
         if not sessions_with_email:
@@ -110,9 +111,9 @@ def login_user(request):
                 "access": str(refresh.access_token),
                 "refresh":str(refresh),
                 "username": user.username,
-                "company": str(company),
                 "role": user.role,
-                "user_id": user.id
+                "user_id": user.id,
+                "interview_sessions": len(sessions_with_email),
                 })
         
         for session in sessions_with_email:
@@ -135,18 +136,25 @@ def login_user(request):
             "access": str(refresh.access_token),
             "refresh":str(refresh),
             "username": user.username,
-            "company": str(company),
             "role": user.role,
             "user_id": user.id,
+            "interview_sessions": len(sessions_with_email)
             })
     else:
+
+        sessions_with_email = list(collection.find( {"created_by": {"$in": [str(user.id)]} } )) 
+
+        print(f"Found {len(sessions_with_email)} sessions created by {user.company}")
+        
+
         return Response({
             "access": str(refresh.access_token),
             "refresh": str(refresh),
             "username": user.username,
             "company": str(user.company),
             "role": user.role,
-            "user_id": user.id
+            "user_id": user.id,
+            "created_sessions": len(sessions_with_email)
         })
     
 
