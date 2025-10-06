@@ -20,6 +20,7 @@ class MongoQuestionSerializer(serializers.Serializer):
 class CandidateSessionsSerializer(serializers.Serializer):
     session_id = serializers.CharField(source='_id')
     position= serializers.CharField(required=False, allow_null=True, default=None)
+    company= serializers.CharField(required=False, allow_null=True, default=None)
     scheduled_time = serializers.DateTimeField(source="scheduled",required=False, allow_null=True)
 
 class CandidateScoreSerializer(serializers.Serializer):
