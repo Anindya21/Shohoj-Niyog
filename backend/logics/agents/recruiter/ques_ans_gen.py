@@ -12,7 +12,7 @@ def get_llm():
 
 def generate_question_and_answer_node(state: RecruiterGraphState) -> RecruiterGraphState:
     prompts= (
-        f"{SYSTEM_PROMPTS}\n\n"
+        # f"{SYSTEM_PROMPTS}\n\n"
         f"Position: {state['position']}\n"
         f"Stacks: {state['stacks']}\n"
         f"Level: {state['level']}\n"
