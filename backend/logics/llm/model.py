@@ -1,7 +1,7 @@
 from langchain_huggingface import HuggingFacePipeline
-from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
+# from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 from logics.llm.prompts import SYSTEM_PROMPTS
-import torch
+# import torch
 import requests
 import json
 from dotenv import load_dotenv
