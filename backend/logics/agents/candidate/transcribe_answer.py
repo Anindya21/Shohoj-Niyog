@@ -5,7 +5,7 @@ import whisper
 ##agents/transcribe_answer.py
 def transcribe_answer_node(state: CandidateGraphState) -> CandidateGraphState:
     
-    model= whisper.load_model("small")
+    model= whisper.load_model("tiny")
 
     options= whisper.DecodingOptions(language="en", fp16=True)
     video_files = state.get("video_files", None)
