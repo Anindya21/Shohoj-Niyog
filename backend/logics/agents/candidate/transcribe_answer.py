@@ -1,12 +1,10 @@
 from logics.graph.schema import CandidateGraphState
 import datetime
 import whisper
-from functools import lru_cache
 ##agents/transcribe_answer.py
 
 model = None
 
-@lru_cache
 def load_transcription_model():
     global model
 
