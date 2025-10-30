@@ -7,9 +7,15 @@ def transcribe_answer_node(state: CandidateGraphState) -> CandidateGraphState:
     
     model= whisper.load_model("small")
 
-    options= whisper.DecodingOptions(language="en", fp16=False)
+    options= whisper.DecodingOptions(language="en", fp16=True)
     video_files = state.get("video_files", None)
     
+    if model is not None:
+        print("Whisper model loaded successfully")
+
+    else:
+        print("Failed to load Whisper Model")
+
     if not video_files:
         print("No video files provided")
         return {

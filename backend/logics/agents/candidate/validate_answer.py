@@ -5,6 +5,12 @@ from scipy.spatial import distance
 
 model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
 
+if model is not None:
+    print("Sentence Transformer model loaded successfully \n")
+else:
+    print("Failed to load Sentence Transformer Model \n")
+
+
 def validate_answer_node(state: CandidateGraphState) -> CandidateGraphState:
     transcribed_text = state.get('transcribed_text', [])
     qa_pair = state.get('question_answer_pairs', [])
