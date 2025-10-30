@@ -1,11 +1,12 @@
 from logics.graph.schema import CandidateGraphState
 import datetime
 import whisper
-
+from functools import lru_cache
 ##agents/transcribe_answer.py
 
 model = None
 
+@lru_cache
 def load_transcription_model():
     global model
 
@@ -17,7 +18,7 @@ def load_transcription_model():
 def transcribe_answer_node(state: CandidateGraphState) -> CandidateGraphState:
     
     load_transcription_model()
-    
+
     video_files = state.get("video_files", None)
 
     if not video_files:
