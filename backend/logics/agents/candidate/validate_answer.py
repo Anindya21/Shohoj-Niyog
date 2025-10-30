@@ -3,15 +3,20 @@ from sentence_transformers import SentenceTransformer
 from scipy.spatial import distance
 
 
-model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
+model = None
 
-if model is not None:
-    print("Sentence Transformer model loaded successfully \n")
-else:
-    print("Failed to load Sentence Transformer Model \n")
+def load_embedder_model():
+    global model
+
+    if model is None:
+        model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
+        print("Loaded Sentence Transformer Model")
 
 
 def validate_answer_node(state: CandidateGraphState) -> CandidateGraphState:
+    
+    load_embedder_model()
+    
     transcribed_text = state.get('transcribed_text', [])
     qa_pair = state.get('question_answer_pairs', [])
 
