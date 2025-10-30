@@ -3,18 +3,22 @@ import datetime
 import whisper
 
 ##agents/transcribe_answer.py
-def transcribe_answer_node(state: CandidateGraphState) -> CandidateGraphState:
-    
-    model= whisper.load_model("tiny")
 
-    options= whisper.DecodingOptions(language="en", fp16=True)
-    video_files = state.get("video_files", None)
-    
-    if model is not None:
+model = None
+
+def load_transcription_model():
+    global model
+
+    if model is None:
+        model= whisper.load_model("tiny")
+        options= whisper.DecodingOptions(language="en", fp16=True)
         print("Whisper model loaded successfully")
 
-    else:
-        print("Failed to load Whisper Model")
+def transcribe_answer_node(state: CandidateGraphState) -> CandidateGraphState:
+    
+    load_transcription_model()
+    
+    video_files = state.get("video_files", None)
 
     if not video_files:
         print("No video files provided")
