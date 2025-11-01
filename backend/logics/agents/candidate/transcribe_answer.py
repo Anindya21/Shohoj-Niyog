@@ -9,7 +9,7 @@ def load_transcription_model():
     global model
 
     if model is None:
-        model= whisper.load_model("tiny")
+        model= whisper.load_model("small")
         options= whisper.DecodingOptions(language="en", fp16=True)
         print("Whisper model loaded successfully")
 

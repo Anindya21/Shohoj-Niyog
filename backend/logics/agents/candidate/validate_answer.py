@@ -1,11 +1,10 @@
 from logics.graph.schema import CandidateGraphState
 from sentence_transformers import SentenceTransformer
 from scipy.spatial import distance
-from functools import lru_cache
+
 
 model = None
 
-@lru_cache
 def load_embedder_model():
     global model
 
