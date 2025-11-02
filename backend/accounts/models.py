@@ -17,7 +17,7 @@ class CustomUser(AbstractUser):
 
     phone= models.CharField(max_length=11, blank=True, null=True)
     role= models.CharField(max_length=20, choices=ROLE_CHOICES, default='candidate')
-    company = models.CharField(max_length=30, blank=False, null=False)
+    company = models.CharField(max_length=30, blank=True, null=True)
 
     USERNAME_FIELD= 'email'
     REQUIRED_FIELDS= ['username','role','phone']
@@ -25,8 +25,8 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f"{self.email}({self.role})"
     
-    def enforce_company(self):
-        super.clean()
+    def clean(self):
+        super().clean()
         if self.role == 'interviewer' and not self.company:
             raise ValidationError({'company': 'Company is required for interviewers.'})
     
