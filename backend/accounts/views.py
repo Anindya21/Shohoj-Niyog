@@ -140,7 +140,7 @@ def login_user(request):
             "role": user.role,
             "user_id": user.id,
             "interview_sessions": len(sessions_with_email)
-            },, status=status.HTTP_200_OK)
+            }, status=status.HTTP_200_OK)
     else:
 
         sessions_with_email = list(collection.find( {"created_by": {"$in": [str(user.id)]} } )) 
