@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import environ
+from datetime import timedelta
 
 env = environ.Env()
 env_path = Path(__file__).resolve().parent.parent.parent / '.env'
@@ -113,6 +114,18 @@ DATABASES = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": "mydatabase",
     }
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=12),  
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=20),  
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": False,
+
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 # Password validation
