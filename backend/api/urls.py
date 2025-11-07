@@ -4,10 +4,10 @@ from . import views
 urlpatterns = [
     path('gen/', views.generate_interview_session, name='Generate Interview Session'),
     path('findall/', views.get_allqa, name='GetAllQA'),
-    path('find/<str:session_id>', views.get_single_question, name="Get Single Question"),
+    path('find/<str:session_id>/', views.get_single_question, name="Get Single Question"),
     path('val/', views.validate_candidate, name= "Authorization for Interview Access"),
     path('response/', views.user_response, name="Save Candidate Response"),
-    path('results/<str:session_id>', views.get_session_results, name="Get Session Results"),
+    path('results/<str:session_id>/', views.get_session_results, name="Get Session Results"),
     path('results/', views.get_session_results, name="Candidate Session Results"),
     path('decide/', views.hiring_decision, name= "Finalize Hiring Decision")
 ] 

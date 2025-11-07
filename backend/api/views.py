@@ -303,7 +303,7 @@ def user_response(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_session_results(request, session_id=None):
+def get_session_results(request, session_id):
 
     user=request.user
 
@@ -360,7 +360,7 @@ def get_session_results(request, session_id=None):
     
     
 ## Hiring Decision API View Recruiter: Can Show interest in a candidate,
-@api_view(['POST'])    ## Need to update this, PUT or PATCH
+@api_view(['PATCH'])    ## Need to update this, PUT or PATCH
 @permission_classes([IsAuthenticated])
 def hiring_decision(request):
     user = request.user
