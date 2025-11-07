@@ -25,6 +25,7 @@ class CandidateSessionsSerializer(serializers.Serializer):
 
 class CandidateScoreSerializer(serializers.Serializer):
     question_id= serializers.CharField()
+    ideal_answer= serializers.CharField()
     given_answer = serializers.CharField()
     score = serializers.FloatField()
 

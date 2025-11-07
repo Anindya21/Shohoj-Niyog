@@ -317,7 +317,7 @@ def get_session_results(request, session_id=None):
         
         try:
             docs = list(collection.find({"session_id": session_id}))
-            print(docs)
+
             for doc in docs:
                 doc['_id'] = str(doc['_id'])
                 doc['session_id'] = str(doc['session_id'])
