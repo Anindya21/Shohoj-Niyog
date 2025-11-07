@@ -25,7 +25,7 @@ class CandidateSessionsSerializer(serializers.Serializer):
 
 class CandidateScoreSerializer(serializers.Serializer):
     question_id= serializers.CharField()
-    ideal_answer= serializers.CharField()
+    ideal_answer= serializers.CharField(required=False, allow_null=True, default=None)
     given_answer = serializers.CharField()
     score = serializers.FloatField()
 
@@ -35,7 +35,7 @@ class CandidateResultSerializer(serializers.Serializer):
     candidate_id = serializers.CharField()
     candidate_name = serializers.CharField()
     candidate_mail = serializers.EmailField()
-    responses = serializers.ListField(child=CandidateScoreSerializer())
+    responses = CandidateScoreSerializer(many=True)
     total_score = serializers.FloatField()
     decision = serializers.CharField()
 

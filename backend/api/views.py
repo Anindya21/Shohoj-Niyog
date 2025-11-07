@@ -303,7 +303,7 @@ def user_response(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_session_results(request, session_id):
+def get_session_results(request, session_id=None):
 
     user=request.user
 
