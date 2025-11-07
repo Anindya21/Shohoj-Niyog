@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path, include ,re_path
 from . import views
 
 urlpatterns = [
@@ -8,5 +8,6 @@ urlpatterns = [
     path('val/', views.validate_candidate, name= "Authorization for Interview Access"),
     path('response/', views.user_response, name="Save Candidate Response"),
     path('results/<str:session_id>', views.get_session_results, name="Get Session Results"),
+    path('results/', views.get_session_results, name="Candidate Session Results"),
     path('decide/', views.hiring_decision, name= "Finalize Hiring Decision")
 ] 

@@ -303,29 +303,51 @@ def user_response(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_session_results(request, session_id):
+def get_session_results(request, session_id=None):
 
-    if not session_id:
-        return Response({"error": "session_id is required."}, status=status.HTTP_400_BAD_REQUEST)
-    
     user=request.user
 
     collection = get_col("user_db")
 
-    try:
-        docs = list(collection.find({"session_id": session_id}))
-        print(docs)
-        for doc in docs:
-            doc['_id'] = str(doc['_id'])
-            doc['session_id'] = str(doc['session_id'])
-            doc['candidate_id'] = str(doc['candidate_id'])
-            for response in doc.get('responses', []):
-                response['question_id'] = str(response['question_id'])
+    if user.role=="interviewer": 
 
-    except:
-        return Response({"error": "No results found for this session."}, status=status.HTTP_404_NOT_FOUND)
+        if not session_id:
+            return Response({"error": "session_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+        try:
+            docs = list(collection.find({"session_id": session_id}))
+            print(docs)
+            for doc in docs:
+                doc['_id'] = str(doc['_id'])
+                doc['session_id'] = str(doc['session_id'])
+                doc['candidate_id'] = str(doc['candidate_id'])
+                for response in doc.get('responses', []):
+                    response['question_id'] = str(response['question_id'])
+
+        except:
+            return Response({"error": "No results found for this session."}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer= CandidateResultSerializer(docs, many=True)
+        return Response(serializer.data, status= status.HTTP_200_OK)
+
 
     if user.role!='interviewer':
+
+        try:
+            docs = list(collection.find({"candidate_mail": user.email}))
+            print(docs)
+            
+            for doc in docs:
+                doc['_id'] = str(doc['_id'])
+                doc['session_id'] = str(doc['session_id'])
+                doc['candidate_id'] = str(doc['candidate_id'])
+                
+                for response in doc.get('responses', []):
+                    response['question_id'] = str(response['question_id'])
+
+        except:
+            return Response({"error": "No results found for this session."}, status=status.HTTP_404_NOT_FOUND)
         
         serializer = CandidateOwnResultSerializer(docs, many=True)
 
@@ -336,9 +358,7 @@ def get_session_results(request, session_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     
-    serializer= CandidateResultSerializer(docs, many=True)
-    return Response(serializer.data, status= status.HTTP_200_OK)
-
+    
 ## Hiring Decision API View Recruiter: Can Show interest in a candidate,
 @api_view(['POST'])    ## Need to update this, PUT or PATCH
 @permission_classes([IsAuthenticated])

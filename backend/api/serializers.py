@@ -41,5 +41,10 @@ class CandidateResultSerializer(serializers.Serializer):
 class CandidateOwnResultSerializer(CandidateSessionsSerializer):
     decision = serializers.CharField()
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data.pop('scheduled_time', None)  
+        return data
+
 
     
