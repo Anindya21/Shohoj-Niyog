@@ -368,8 +368,8 @@ def hiring_decision(request):
     candidate_id = request.data.get('candidate_id')
     decision= request.data.get('decision')
 
-    if not session_id or not candidate_id or not decision:
-        return Response({"error": "session_id, candidate_id and decision are required."}, status=status.HTTP_400_BAD_REQUEST)
+    if not session_id or not decision:
+            return Response({"error": "session_id and decision are required."}, status=status.HTTP_400_BAD_REQUEST)
     
 
     if decision not in ["interested","not_interested", "accept","reject"]:
@@ -379,7 +379,11 @@ def hiring_decision(request):
 
     
     if user.role != "candidate":
-        # Consider pending also 
+        # Consider pending also
+        # 
+        if not session_id or not candidate_id or not decision:
+            return Response({"error": "session_id, candidate_id and decision are required."}, status=status.HTTP_400_BAD_REQUEST)
+     
         if decision not in ["interested", "not_interested"]:
             return Response({"error": "Your only option as a recruiter is interested or not interested."}, status=status.HTTP_400_BAD_REQUEST)
         
