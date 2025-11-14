@@ -17,6 +17,12 @@ class MongoQuestionPullSerializer(serializers.Serializer):
 
 class MongoQuestionSerializer(serializers.Serializer):
     question = serializers.CharField()
+
+class CandidateAllSessionsSerializer(serializers.Serializer):
+    id = serializers.CharField(source='_id')
+    position=serializers.CharField(required=False, allow_null=True, default=None)
+    company= serializers.CharField(required=False, allow_null=True, default=None)
+    scheduled_time = serializers.DateTimeField(source="scheduled",required=False, allow_null=True)    
 class CandidateSessionsSerializer(serializers.Serializer):
     id = serializers.CharField(source='_id')
     session_id = serializers.CharField()

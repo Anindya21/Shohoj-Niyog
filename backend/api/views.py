@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import QAPair
-from .serializers import MongoQuestionPullSerializer, MongoQuestionSerializer, CandidateSessionsSerializer, CandidateResultSerializer, CandidateOwnResultSerializer
+from .serializers import MongoQuestionPullSerializer, MongoQuestionSerializer, CandidateSessionsSerializer, CandidateResultSerializer, CandidateOwnResultSerializer, CandidateAllSessionsSerializer
 from logics.db.mongo import get_db_handle
 from logics.graph.builder import build_recruiter_graph, build_candidate_graph
 from logics.utils.env_loader import load_env
@@ -119,7 +119,7 @@ def get_allqa(request):  ## To Display All Questions and Answers
         for doc in docs:
             doc['_id'] = str(doc['_id'])
         
-        serializer= CandidateSessionsSerializer(docs, many=True)
+        serializer= CandidateAllSessionsSerializer(docs, many=True)
         
         return Response(serializer.data, status= status.HTTP_200_OK)
     
