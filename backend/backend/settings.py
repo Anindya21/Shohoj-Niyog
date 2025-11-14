@@ -80,7 +80,8 @@ else:
     
     CORS_ALLOWED_ORIGINS = [
         "https://vercel.com",
-        "https://shohoj-niyog.vercel.app",  
+        "https://shohoj-niyog.vercel.app",
+        "http://localhost:3000",  
         
     ]
 
