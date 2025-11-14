@@ -399,37 +399,39 @@ def hiring_decision(request):
             {"message": f"Successfully updated the hiring decision for the candidate {candidate_id} in session {session_id}."},
         )
 
-    
+    if user.role == "candidate":
 
-    if decision not in ["accept", "reject"]:
-        return Response({"error": "Your only option as a candidate is accept or reject."}, status=status.HTTP_403_FORBIDDEN)
-        
-    responses = collection.find_one( {"session_id": str(session_id), "candidate_id": str(user.id)})
-
-    if not responses:
-        return Response("No responses found for this session and candidate.", status=404)
-
-    rec_decision = responses.get("decision")
-
-    if rec_decision=="pending":
-        return Response({"message": "Your interview is still under review by the recruiter."}, status=status.HTTP_200_OK)
-        
-    elif rec_decision == "interested" and decision == "accept":
+        if decision not in ["accept", "reject"]:
+            return Response({"error": "Your only option as a candidate is accept or reject."}, status=status.HTTP_403_FORBIDDEN)
             
-        result = collection.update_one(
-            {"session_id":str(session_id), "candidate_id": str(user.id)},
-                {"$set": {"decision": decision}}
-                )
-            
-        return Response({"message": f"Congratulations! You have made your decision to {decision} the offer."}, status=status.HTTP_200_OK)
+        responses = collection.find_one( {"session_id": str(session_id), "candidate_id": str(user.id)})
 
-    elif rec_decision == "interested" and decision == "reject":
-        result = collection.update_one(
+        print(responses)
+
+        if not responses:
+            return Response("No responses found for this session and candidate.", status=404)
+
+        rec_decision = responses.get("decision")
+
+        if rec_decision=="pending":
+            return Response({"message": "Your interview is still under review by the recruiter."}, status=status.HTTP_200_OK)
+            
+        elif rec_decision == "interested" and decision == "accept":
+                
+            result = collection.update_one(
                 {"session_id":str(session_id), "candidate_id": str(user.id)},
-                {"$set": {"decision": decision}}
-                )
+                    {"$set": {"decision": decision}}
+                    )
+                
+            return Response({"message": f"Congratulations! You have made your decision to {decision} the offer."}, status=status.HTTP_200_OK)
 
-        return Response({"message": f"You have decided to {decision} the offer. Thank you for your time."}, status=status.HTTP_200_OK)
-        
-    elif rec_decision == "not_interested":
-        return Response({"message": "Sorry, you couldn't match our vibe. Wish you all the best!"}, status=status.HTTP_200_OK)
+        elif rec_decision == "interested" and decision == "reject":
+            result = collection.update_one(
+                    {"session_id":str(session_id), "candidate_id": str(user.id)},
+                    {"$set": {"decision": decision}}
+                    )
+
+            return Response({"message": f"You have decided to {decision} the offer. Thank you for your time."}, status=status.HTTP_200_OK)
+            
+        elif rec_decision == "not_interested":
+            return Response({"message": "Sorry, you couldn't match our vibe. Wish you all the best!"}, status=status.HTTP_200_OK)
