@@ -202,7 +202,6 @@ def validate_candidate(request):
     
     return Response({"status": "Authorized", "message": "Welcome to the interview session."})
 
-
 ## Candidate Response API View
 
 @api_view(["POST"])
@@ -347,17 +346,15 @@ def get_session_results(request, session_id=None):
                     response['question_id'] = str(response['question_id'])
 
         except:
-            return Response({"error": "No results found for this session."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "No results found for this session."}, status=status.HTTP_204_NO_CONTENT)
         
         serializer = CandidateOwnResultSerializer(docs, many=True)
 
         if not serializer.data:
-            return Response({"message": "Empty Serializer Data."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Candidate has not given any response yet."}, status=status.HTTP_204_NO_CONTENT)
 
         
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    
     
 ## Hiring Decision API View Recruiter: Can Show interest in a candidate,
 @api_view(['PATCH'])    ## Need to update this, PUT or PATCH
@@ -380,7 +377,6 @@ def hiring_decision(request):
     
     if user.role != "candidate":
         # Consider pending also
-        # 
         if not session_id or not candidate_id or not decision:
             return Response({"error": "session_id, candidate_id and decision are required."}, status=status.HTTP_400_BAD_REQUEST)
      
@@ -437,12 +433,3 @@ def hiring_decision(request):
         
     elif rec_decision == "not_interested":
         return Response({"message": "Sorry, you couldn't match our vibe. Wish you all the best!"}, status=status.HTTP_200_OK)
-
-
-
-        
-    
-    
-
-
-
