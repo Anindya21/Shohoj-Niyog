@@ -317,12 +317,14 @@ def get_session_results(request, session_id=None):
         try:
             docs = list(collection.find({"session_id": session_id}))
 
+
             for doc in docs:
                 doc['_id'] = str(doc['_id'])
                 doc['session_id'] = str(doc['session_id'])
                 doc['candidate_id'] = str(doc['candidate_id'])
                 for response in doc.get('responses', []):
                     response['question_id'] = str(response['question_id'])
+
 
         except:
             return Response({"error": "No results found for this session."}, status=status.HTTP_404_NOT_FOUND)
