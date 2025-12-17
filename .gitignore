@@ -14,3 +14,5 @@ test.py
 # Virtual environments
 .venv
 .env
+*.ppk
+django-key.ppk
