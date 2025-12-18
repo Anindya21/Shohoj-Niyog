@@ -44,32 +44,47 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
         average_score = sum(scores)/ len(scores)
 
         
-        result= can_col.insert_one({
-            "session_id": interview_id,
-            "position":position,
-            "candidate_id": candidate_id,
-            "candidate_name": candidate_name,
-            "candidate_mail": candidate_mail,
-            "responses": responses,
-            "total_score": average_score,
-            "decision": "pending",
-            "created": datetime.now(timezone.utc)
-        })
+        can_col.update_one(
+        {"session_id": interview_id, "candidate_id": candidate_id},
+        {"$set": {
+        "position": position,
+        "responses": responses,
+        "total_score": average_score,
+        "decision": "pending",
+        "status": "completed",
+        "completed_at": datetime.now(timezone.utc)
+        }}
+)
 
-        print(f"Saved candidate response with ID: {result.inserted_id}")
+        
         
         return {
-            **state,
-            "transcribed_text": transcribed_text,
-            "responses": responses,
-            "total_score": average_score,
-            "save_status": "success",
-            "responsed_id": str(result.inserted_id)
+        **state,
+        "responses": responses,
+        "total_score": average_score,
+        "save_status": "success"
         }
     
-    except:
-        print("Failed to save candidate response.")
+
+    except Exception as e:
+        can_col.update_one(
+        {"session_id": interview_id, "candidate_id": candidate_id},
+        {"$set": {
+            "status": "failed",
+            "error": str(e),
+            "failed_at": datetime.now(timezone.utc)
+        }}
+    )
+
         return {
-            **state,
-            "save_status": "failed"
+        **state,
+        "save_status": "failed"
         }
+    
+    finally:
+        for path in state.get("video_files", []):
+            try:
+                if os.path.exists(path):
+                    os.unlink(path)
+            except Exception:
+                pass

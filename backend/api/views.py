@@ -14,6 +14,8 @@ import os, uuid, logging, mimetypes, tempfile
 from rest_framework import status
 from functools import lru_cache
 
+from logics.utils.tasks import run_candidate_graph
+
 load_env()
 
 logger = logging.getLogger(__name__)
@@ -272,31 +274,33 @@ def user_response(request):
             "allowed_candidates": []
             }
         
-        result = get_candidate_graph().invoke(inputs)
+        user_col.insert_one({
+            "session_id": session_oid,
+            "candidate_id": user_id,
+            "candidate_name": user_name,
+            "candidate_mail": user_mail,
+            "status": "processing",
+            "created_at": timezone.now()
+            })
+        run_candidate_graph.delay(inputs)
 
-        if result.get("responsed_id") is not None:
 
-            return Response({
-                "status": "success",
-                "message": "Responses saved successfully. Thank you for joining the interview session.",
-                "responsed_id": result.get("responsed_id")
-
-            }, status=status.HTTP_201_CREATED)
-        
-        else:
-            return Response({"error": "Failed to save responses"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({
+                    "status": "accepted",
+                    "message": "Responses are being processed"
+        }, status=status.HTTP_202_ACCEPTED)
         
     except Exception as e:
         logger.exception("user_response failed")
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    finally:
-        for temp_path in temp_video_paths:
-            try:
-                if os.path.exists(temp_path):
-                    os.unlink(temp_path)
-            except Exception:
-                logger.warning("Temp cleanup failed for %s", temp_path)
+    # finally:
+    #     for path in state.get("video_files", []):
+    #         try:
+    #             if os.path.exists(path):
+    #                 os.unlink(path)
+    #         except Exception:
+    #             pass
 
 # Session Results View for both Candidate and Recruiter
 
