@@ -24,10 +24,6 @@ logger = logging.getLogger(__name__)
 def get_recruiter_graph():
     return build_recruiter_graph()
 
-@lru_cache(maxsize=1)
-def get_candidate_graph():
-    return build_candidate_graph()
-
 def get_db():
     db, _ = get_db_handle("interview_db")
     return db

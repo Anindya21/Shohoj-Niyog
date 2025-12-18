@@ -2,12 +2,6 @@ from logics.graph.schema import CandidateGraphState
 import datetime
 import whisper
 ##agents/transcribe_answer.py
-<<<<<<< HEAD
-=======
-def transcribe_answer_node(state: CandidateGraphState) -> CandidateGraphState:
-    
-    model= whisper.load_model("tiny")
->>>>>>> model
 
 model = None
 
