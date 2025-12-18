@@ -15,5 +15,7 @@ test.py
 .venv
 .env
 
+
 *.ppk
 django-key.ppk
+
