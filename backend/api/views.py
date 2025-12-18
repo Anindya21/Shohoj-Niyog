@@ -13,7 +13,7 @@ from django.utils import timezone
 import os, uuid, logging, mimetypes, tempfile
 from rest_framework import status
 from functools import lru_cache
-from rest_framework.parsers import MultiPartParser, FormParser
+
 
 from logics.utils.tasks import run_candidate_graph
 
@@ -205,7 +205,6 @@ def validate_candidate(request):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-@parser_classes([MultiPartParser, FormParser])
 def user_response(request):
     user = request.user
 
