@@ -22,7 +22,7 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
         candidate_name = state.get("candidate_name", None)
         position = state.get("position", None)
 
-        interview_id = ObjectId(interview_id) if isinstance(interview_id, str) else interview_id
+        
         if not interview_id or not candidate_id:
             print("No interview ID or candidate ID provided.")
             return {
@@ -47,26 +47,28 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
 
         
         can_col.update_one(
-        {"session_id": interview_id, "candidate_id": candidate_id},
-        {"$set": {
-        "position": position,
-        "responses": responses,
-        "total_score": average_score,
-        "decision": "pending",
-        "status": "completed",
-        "completed_at": datetime.now(timezone.utc)
+            {"session_id": interview_id, 
+             "candidate_id": candidate_id
+             },
+            {"$set": {
+                "position": position,
+                "responses": responses,
+                "total_score": average_score,
+                "decision": "pending",
+                "status": "completed",
+                "completed_at": datetime.now(timezone.utc)
         }},
-        upsert=True
+        upsert=False
 )
 
         
         
         return {
-        **state,
-        "responses": responses,
-        "total_score": average_score,
-        "save_status": "success"
-        }
+            **state,
+            "responses": responses,
+            "total_score": average_score,
+            "save_status": "success"
+            }
     
 
     except Exception as e:
