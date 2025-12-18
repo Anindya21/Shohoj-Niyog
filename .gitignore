@@ -15,6 +15,7 @@ test.py
 .venv
 .env
 
+backend/staticfiles/
 
 *.ppk
 django-key.ppk
