@@ -238,10 +238,29 @@ def user_response(request):
     if user_id not in allowed_candidates and user_mail not in allowed_candidates:
         return Response({"error": "You are not allowed to join this session."}, status=status.HTTP_403_FORBIDDEN)
     
-    prev_response= user_col.find_one({'session_id': session_oid, 'candidate_id': user_id},projection={'_id': 1})
+    prev_response = user_col.find_one(
+        {'session_id': session_oid, 'candidate_id': user_id}
+    )
 
     if prev_response:
-        return Response({"message": "You have already submitted your responses for this session."}, status=status.HTTP_403_FORBIDDEN)
+        status_ = prev_response.get("status")
+
+        if status_ == "processing":
+            return Response(
+            {
+                "status": "processing",
+                "message": "Your responses are already being processed."
+            },
+            status=status.HTTP_202_ACCEPTED
+            )
+
+        if status_ == "completed":
+            return Response(
+            {
+                "message": "You have already submitted your responses for this session."
+            },
+            status=status.HTTP_403_FORBIDDEN
+            )
 
 
     video_files = request.FILES.getlist("video")
