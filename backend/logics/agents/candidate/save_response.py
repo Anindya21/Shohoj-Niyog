@@ -17,6 +17,10 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
         transcribed_text = state.get("transcribed_text", [])
         scores= state.get("scores", [])
         interview_id = state.get("interview_id")
+
+        if isinstance(interview_id, str):
+            interview_id = ObjectId(interview_id)
+            
         candidate_id = state.get("candidate_id")
         candidate_mail = state.get("candidate_mail", None)
         candidate_name = state.get("candidate_name", None)

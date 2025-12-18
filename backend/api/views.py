@@ -278,7 +278,7 @@ def user_response(request):
                 temp_video_paths.append(temp_file.name)
       
         inputs= {
-            "interview_id": session_oid,
+            "interview_id": str(session_oid),
             "candidate_id": user_id,
             "candidate_name": user_name,
             "candidate_mail": user_mail,
