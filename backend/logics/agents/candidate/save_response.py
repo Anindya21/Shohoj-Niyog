@@ -2,6 +2,7 @@ from logics.graph.schema import CandidateGraphState
 from logics.db.mongo import get_db_handle
 from datetime import datetime,timezone
 import os
+from bson import ObjectId
 
 def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
     
@@ -21,6 +22,7 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
         candidate_name = state.get("candidate_name", None)
         position = state.get("position", None)
 
+        interview_id = ObjectId(interview_id) if isinstance(interview_id, str) else interview_id
         if not interview_id or not candidate_id:
             print("No interview ID or candidate ID provided.")
             return {
@@ -53,7 +55,8 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
         "decision": "pending",
         "status": "completed",
         "completed_at": datetime.now(timezone.utc)
-        }}
+        }},
+        upsert=True
 )
 
         
