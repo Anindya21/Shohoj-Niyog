@@ -81,7 +81,6 @@ if DEBUG:
 else:
     
     CORS_ALLOWED_ORIGINS = [
-        "https://vercel.com",
         "https://shohoj-niyog.vercel.app",
         "http://127.0.0.1:3000",
         "http://localhost:3000",
@@ -141,6 +140,15 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+]
+
+CORS_ALLOW_METHODS=[
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
 ]
 
 # Database
