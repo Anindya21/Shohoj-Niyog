@@ -333,9 +333,20 @@ def get_session_results(request, session_id=None):
         if not session_id:
             return Response({"error": "session_id is required."}, status=status.HTTP_400_BAD_REQUEST)
         
-        
         try:
-            docs = list(collection.find({"session_id": session_id}))
+            try:
+                session_oid = ObjectId(session_id)
+                query = {
+                    "$or": [
+                        {"session_id": session_oid},
+                        {"session_id": session_id}  # backward compatibility
+                    ]
+                }
+
+            except Exception:
+                query = {"session_id": session_id}
+                
+            docs = list(collection.find(query))
 
 
             for doc in docs:
@@ -356,7 +367,27 @@ def get_session_results(request, session_id=None):
     if user.role!='interviewer':
 
         try:
-            docs = list(collection.find({"candidate_mail": user.email}))
+            try:
+                session_oid = ObjectId(session_id)
+                query = {
+                    "$and": [
+                {
+                    "$or": [
+                        {"session_id": session_oid},
+                        {"session_id": session_id}
+                    ]
+                },
+                {"candidate_mail": user.email}
+            ]
+                }
+
+            except Exception:
+                query = {
+                "session_id": session_id,
+                "candidate_mail": user.email
+                }
+             
+            docs = list(collection.find(query))
             print(docs)
             
             for doc in docs:
