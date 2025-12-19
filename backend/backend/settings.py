@@ -76,7 +76,7 @@ if DEBUG:
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:8000",
-        "http://16.16.186.219",
+        "https://16.16.186.219.sslip.io",
     ]
 else:
     
@@ -85,9 +85,22 @@ else:
         "https://shohoj-niyog.vercel.app",
         "http://127.0.0.1:3000",
         "http://localhost:3000",
-        "http://16.16.186.219",  
+        "https://16.16.186.219.sslip.io",  
         
     ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://shohoj-niyog.vercel.app",
+    "https://16.16.186.219.sslip.io",
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_ACCEPT_CONTENT = ["json"]

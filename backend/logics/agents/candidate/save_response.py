@@ -20,7 +20,7 @@ def save_response_node(state: CandidateGraphState) -> CandidateGraphState:
 
         if isinstance(interview_id, str):
             interview_id = ObjectId(interview_id)
-            
+
         candidate_id = state.get("candidate_id")
         candidate_mail = state.get("candidate_mail", None)
         candidate_name = state.get("candidate_name", None)
