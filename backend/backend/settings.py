@@ -71,6 +71,9 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware', 
 ]
 
+
+CORS_ALLOW_CREDENTIALS = True
+
 if DEBUG:
     CORS_ALLOWED_ORIGINS = [
         "http://localhost:3000",
@@ -87,6 +90,29 @@ else:
         "https://16.16.186.219.sslip.io",  
         
     ]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_ALLOW_METHODS=[
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+]
+
+CORS_URLS_REGEX = r"^/.*$"
 
 CSRF_TRUSTED_ORIGINS = [
     "https://shohoj-niyog.vercel.app",
@@ -109,7 +135,7 @@ CELERY_TIMEZONE = "UTC"
 
 CELERY_RESULT_BACKEND = "django-db"
 
-CORS_ALLOW_CREDENTIALS = True
+
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -129,27 +155,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
-
-CORS_ALLOW_METHODS=[
-    "GET",
-    "POST",
-    "PUT",
-    "PATCH",
-    "DELETE",
-    "OPTIONS",
-]
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
