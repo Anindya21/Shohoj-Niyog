@@ -358,19 +358,10 @@ def get_session_results(request, session_id=None):
 
     if user.role!='interviewer':
 
-        try:
-            session_oid = ObjectId(session_id)
-            query = {
-                "session_id": session_oid,
-                "candidate_mail": user.email
-                }
-        except Exception:
-            query = {
-                "session_id": session_id,
-                "candidate_mail": user.email
-                }
-
-        docs = list(collection.find(query))
+        docs = list(
+            collection.find(
+                {"candidate_mail": user.email}).sort("created_at", -1)
+                )
         print(docs)
             
         for doc in docs:
