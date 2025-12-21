@@ -334,72 +334,53 @@ def get_session_results(request, session_id=None):
             return Response({"error": "session_id is required."}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            try:
-                session_oid = ObjectId(session_id)
-                query = {
-                    "$or": [
-                        {"session_id": session_oid},
-                        {"session_id": session_id}  # backward compatibility
-                    ]
-                }
+            session_oid = ObjectId(session_id)
+            query = {"session_id": session_oid}
+        except Exception:
+            query = {"session_id": session_id}
 
-            except Exception:
-                query = {"session_id": session_id}
-                
-            docs = list(collection.find(query))
+        docs = list(collection.find(query))
 
 
-            for doc in docs:
-                doc['_id'] = str(doc['_id'])
-                doc['session_id'] = str(doc['session_id'])
-                doc['candidate_id'] = str(doc['candidate_id'])
-                for response in doc.get('responses', []):
-                    response['question_id'] = str(response['question_id'])
+
+        for doc in docs:
+            doc['_id'] = str(doc['_id'])
+            doc['session_id'] = str(doc['session_id'])
+            doc['candidate_id'] = str(doc['candidate_id'])
+            for response in doc.get('responses', []):
+                response['question_id'] = str(response['question_id'])
 
 
-        except:
-            return Response({"error": "No results found for this session."}, status=status.HTTP_404_NOT_FOUND)
-        
         serializer= CandidateResultSerializer(docs, many=True)
+        
         return Response(serializer.data, status= status.HTTP_200_OK)
 
 
     if user.role!='interviewer':
 
         try:
-            try:
-                session_oid = ObjectId(session_id)
-                query = {
-                    "$and": [
-                {
-                    "$or": [
-                        {"session_id": session_oid},
-                        {"session_id": session_id}
-                    ]
-                },
-                {"candidate_mail": user.email}
-            ]
+            session_oid = ObjectId(session_id)
+            query = {
+                "session_id": session_oid,
+                "candidate_mail": user.email
                 }
-
-            except Exception:
-                query = {
+        except Exception:
+            query = {
                 "session_id": session_id,
                 "candidate_mail": user.email
                 }
-             
-            docs = list(collection.find(query))
-            print(docs)
-            
-            for doc in docs:
-                doc['_id'] = str(doc['_id'])
-                doc['session_id'] = str(doc['session_id'])
-                doc['candidate_id'] = str(doc['candidate_id'])
-                
-                for response in doc.get('responses', []):
-                    response['question_id'] = str(response['question_id'])
 
-        except:
-            return Response({"error": "No results found for this session."}, status=status.HTTP_204_NO_CONTENT)
+        docs = list(collection.find(query))
+        print(docs)
+            
+        for doc in docs:
+            doc['_id'] = str(doc['_id'])
+            doc['session_id'] = str(doc['session_id'])
+            doc['candidate_id'] = str(doc['candidate_id'])
+                
+            for response in doc.get('responses', []):
+                response['question_id'] = str(response['question_id'])
+
         
         serializer = CandidateOwnResultSerializer(docs, many=True)
 
