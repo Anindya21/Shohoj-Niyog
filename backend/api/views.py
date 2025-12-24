@@ -25,29 +25,11 @@ logger = logging.getLogger(__name__)
 def get_recruiter_graph():
     return build_recruiter_graph()
 
-def get_db():
-    db, _ = get_db_handle("interview_db")
-    return db
-
-def get_col(name):
-    return get_db()[name]
 
 def to_object_id(id_str):
     if not ObjectId.is_valid(id_str):
         raise InvalidId("Invalid ObjectId")
     return ObjectId(id_str)
-
-def ensure_indexes():
-    try:
-        db = get_db()
-        db['qa_pairs'].create_index('created_by', background=True)
-        db['qa_pairs'].create_index('allowed_candidates', background=True)
-        db['user_db'].create_index([('session_id', 1), ('candidate_id', 1)], background=True)
-        db['user_db'].create_index('candidate_id', background=True)
-    except Exception:
-        logger.exception("Index ensure failed")
-
-ensure_indexes()
 
 ## Interview Session Generation API View
 
@@ -97,7 +79,9 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
 def get_allqa(request):  ## To Display All Questions and Answers
     
     user= request.user               
-    collection = get_col('qa_pairs')
+    db, _ = get_db_handle("interview_db")
+    collection = db["qa_pairs"]
+
 
     try:
         limit= min(int(request.GET.get('limit',50)),200)
@@ -141,7 +125,9 @@ def get_allqa(request):  ## To Display All Questions and Answers
 def get_single_question(request, session_id):   ## To Display Single Question and Answers
     
     user= request.user 
-    collection= get_col('qa_pairs')
+    db, _ = get_db_handle("interview_db")
+    collection = db["qa_pairs"]
+
 
     try:
         oid = to_object_id(session_id)
@@ -183,7 +169,6 @@ def validate_candidate(request):
         return Response({"error": "session_id is required."}, status=400)
     
     try:
-        uri = os.getenv("mongo_uri")
         db, _ = get_db_handle("interview_db")
         collection = db['qa_pairs']
 
@@ -225,8 +210,9 @@ def user_response(request):
         return Response({"error": "Invalid session_id format."}, status=status.HTTP_400_BAD_REQUEST)
 
     
-    qa_col = get_col('qa_pairs')
-    user_col = get_col('user_db')
+    db, _ = get_db_handle("interview_db")
+    qa_col = db["qa_pairs"]
+    user_col = db["user_db"]
 
 
     docs= qa_col.find_one({'_id': session_oid}, projection={'allowed_candidates': 1})
@@ -310,13 +296,6 @@ def user_response(request):
         logger.exception("user_response failed")
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    # finally:
-    #     for path in state.get("video_files", []):
-    #         try:
-    #             if os.path.exists(path):
-    #                 os.unlink(path)
-    #         except Exception:
-    #             pass
 
 # Session Results View for both Candidate and Recruiter
 
@@ -326,7 +305,9 @@ def get_session_results(request, session_id=None):
 
     user=request.user
 
-    collection = get_col("user_db")
+    db, _ = get_db_handle("interview_db")
+    collection = db["user_db"]
+
 
     if user.role=="interviewer": 
 
@@ -397,7 +378,8 @@ def hiring_decision(request):
     if decision not in ["interested","not_interested", "accept","reject"]:
             return Response({"error": "decision must be 'interested','not_interested', 'accept' or 'reject'."}, status=status.HTTP_400_BAD_REQUEST)
     
-    collection = get_col('user_db')
+    db, _ = get_db_handle("interview_db")
+    collection = db['user_db']
 
     
     if user.role != "candidate":
