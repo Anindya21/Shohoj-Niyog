@@ -2,7 +2,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import QAPair
-from .serializers import MongoQuestionPullSerializer, MongoQuestionSerializer, CandidateSessionsSerializer, CandidateResultSerializer, CandidateOwnResultSerializer, CandidateAllSessionsSerializer
+from .serializers import (MongoQuestionPullSerializer, MongoQuestionSerializer, 
+                          CandidateSessionsSerializer, CandidateResultSerializer, 
+                          CandidateOwnResultSerializer, CandidateAllSessionsSerializer)
+
 from logics.db.mongo import get_db_handle
 from logics.graph.builder import build_recruiter_graph, build_candidate_graph
 from logics.utils.env_loader import load_env

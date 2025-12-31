@@ -117,14 +117,16 @@ CORS_URLS_REGEX = r"^/.*$"
 CSRF_TRUSTED_ORIGINS = [
     "https://shohoj-niyog.vercel.app",
     "https://16.16.186.219.sslip.io",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
