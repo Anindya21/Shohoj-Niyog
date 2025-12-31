@@ -84,10 +84,9 @@ if DEBUG:
 else:
     
     CORS_ALLOWED_ORIGINS = [
-        "http://localhost:3000",
         "https://shohoj-niyog.vercel.app",
         "http://127.0.0.1:3000",
-        
+        "http://localhost:3000",
         "https://16.16.186.219.sslip.io",  
         
     ]
@@ -118,8 +117,6 @@ CORS_URLS_REGEX = r"^/.*$"
 CSRF_TRUSTED_ORIGINS = [
     "https://shohoj-niyog.vercel.app",
     "https://16.16.186.219.sslip.io",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
