@@ -34,6 +34,12 @@ def to_object_id(id_str):
         raise InvalidId("Invalid ObjectId")
     return ObjectId(id_str)
 
+def session_id_query(session_id):
+    try:
+        return {"$in": [session_id, to_object_id(session_id)]}
+    except InvalidId:
+        return session_id
+    
 ## Interview Session Generation API View
 
 @api_view(["POST"])
@@ -394,19 +400,20 @@ def hiring_decision(request):
             return Response({"error": "Your only option as a recruiter is interested or not interested."}, status=status.HTTP_400_BAD_REQUEST)
         
         
-        responses = collection.find_one( {"session_id": str(session_id), "candidate_id": candidate_id})
+        responses = collection.find_one( {"session_id": session_id_query(session_id), "candidate_id": candidate_id})
 
         if not responses:
             return Response("No responses found for this session and candidate.", status=status.HTTP_404_NOT_FOUND)
 
 
         result =  collection.update_one(
-            {"session_id":str(session_id), "candidate_id": candidate_id},
+            {"session_id":session_id_query(session_id), "candidate_id": candidate_id},
             {"$set": {"decision": decision}}
         )
         
         return Response(
             {"message": f"Successfully updated the hiring decision for the candidate {candidate_id} in session {session_id}."},
+            status=status.HTTP_200_OK
         )
 
     if user.role == "candidate":
@@ -414,7 +421,7 @@ def hiring_decision(request):
         if decision not in ["accept", "reject"]:
             return Response({"error": "Your only option as a candidate is accept or reject."}, status=status.HTTP_403_FORBIDDEN)
             
-        responses = collection.find_one( {"session_id": str(session_id), "candidate_id": str(user.id)})
+        responses = collection.find_one( {"session_id": session_id_query(session_id), "candidate_id": str(user.id)})
 
         print(responses)
 
@@ -429,7 +436,7 @@ def hiring_decision(request):
         elif rec_decision == "interested" and decision == "accept":
                 
             result = collection.update_one(
-                {"session_id":str(session_id), "candidate_id": str(user.id)},
+                {"session_id":session_id_query(session_id), "candidate_id": str(user.id)},
                     {"$set": {"decision": decision}}
                     )
                 
@@ -437,7 +444,7 @@ def hiring_decision(request):
 
         elif rec_decision == "interested" and decision == "reject":
             result = collection.update_one(
-                    {"session_id":str(session_id), "candidate_id": str(user.id)},
+                    {"session_id":session_id_query(session_id), "candidate_id": str(user.id)},
                     {"$set": {"decision": decision}}
                     )
 
