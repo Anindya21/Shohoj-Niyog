@@ -31,10 +31,10 @@ class CandidateSessionsSerializer(serializers.Serializer):
     scheduled_time = serializers.DateTimeField(source="scheduled",required=False, allow_null=True)
 
 class CandidateScoreSerializer(serializers.Serializer):
-    question_id= serializers.CharField()
+    question_id= serializers.CharField(required= False)
     ideal_answer= serializers.CharField(required=False, allow_null=True, default=None)
-    given_answer = serializers.CharField()
-    score = serializers.FloatField()
+    given_answer = serializers.CharField(required= False)
+    score = serializers.FloatField(required= False)
 
 class CandidateResultSerializer(serializers.Serializer):
     id= serializers.CharField(source='_id')
@@ -42,12 +42,16 @@ class CandidateResultSerializer(serializers.Serializer):
     candidate_id = serializers.CharField()
     candidate_name = serializers.CharField()
     candidate_mail = serializers.EmailField()
-    responses = CandidateScoreSerializer(many=True)
-    total_score = serializers.FloatField()
-    decision = serializers.CharField()
+    
+    responses = CandidateScoreSerializer(many=True, required= False, allow_null=True)
+    total_score = serializers.FloatField(required= False, allow_null= True)
+    decision = serializers.CharField(required=False, allow_null=True)
+
+    status = serializers.CharField()
 
 class CandidateOwnResultSerializer(CandidateSessionsSerializer):
-    decision = serializers.CharField()
+    decision = serializers.CharField(required=False, allow_null=True)
+    status = serializers.CharField()
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

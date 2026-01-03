@@ -337,8 +337,12 @@ def get_session_results(request, session_id=None):
             doc['_id'] = str(doc['_id'])
             doc['session_id'] = str(doc['session_id'])
             doc['candidate_id'] = str(doc['candidate_id'])
-            for response in doc.get('responses', []):
-                response['question_id'] = str(response['question_id'])
+
+            responses = doc.get("responses")
+
+            if isinstance(responses,list):
+                for response in responses:
+                    response['question_id'] = str(response['question_id'])
 
 
         serializer= CandidateResultSerializer(docs, many=True)
