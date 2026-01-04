@@ -47,11 +47,11 @@ class CandidateResultSerializer(serializers.Serializer):
     total_score = serializers.FloatField(required= False, allow_null= True)
     decision = serializers.CharField(required=False, allow_null=True)
 
-    status = serializers.CharField()
+    status = serializers.CharField(required=False, allow_null=True)
 
 class CandidateOwnResultSerializer(CandidateSessionsSerializer):
     decision = serializers.CharField(required=False, allow_null=True)
-    status = serializers.CharField()
+    status = serializers.CharField(required=False, allow_null=True)
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
