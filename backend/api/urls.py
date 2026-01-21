@@ -9,5 +9,6 @@ urlpatterns = [
     path('response/', views.user_response, name="Save Candidate Response"),
     path('results/<str:session_id>/', views.get_session_results, name="Get Session Results"),
     path('results/', views.get_session_results, name="Candidate Session Results"),
-    path('decide/', views.hiring_decision, name= "Finalize Hiring Decision")
+    path('decide/', views.hiring_decision, name= "Finalize Hiring Decision"),
+    path('find/<str:session_id>/delete/', views.delete_session, name="Delete Interview Session"),
 ] 
