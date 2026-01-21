@@ -128,6 +128,35 @@ def get_allqa(request):  ## To Display All Questions and Answers
     
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_session(request, session_id):
+    user = request.user
+
+    if user.role == "candidate":
+        return Response({"message": "Unauthorized Action"}, status=status.HTTP_403_FORBIDDEN)
+    
+    db = get_db_handle("interview_db")
+    collection = db["qa_pairs"]
+
+    try:
+        oid = to_object_id(session_id)
+        session = collection.find_one({'_id': oid})
+    
+    except InvalidId:
+        session = collection.find_one({'_id': session_id})
+
+
+    if session is None:
+        return Response({"error": "Session not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    if session['created_by'] != str(user.id):
+        return Response({"message": "You do not have permission to delete this session."}, status=status.HTTP_403_FORBIDDEN)
+    
+    collection.delete_one({'_id': session['_id']})
+
+    return Response({"message": "Session deleted successfully."}, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
