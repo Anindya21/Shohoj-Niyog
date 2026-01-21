@@ -136,7 +136,7 @@ def delete_session(request, session_id):
     if user.role == "candidate":
         return Response({"message": "Unauthorized Action"}, status=status.HTTP_403_FORBIDDEN)
     
-    db = get_db_handle("interview_db")
+    db, _ = get_db_handle("interview_db")
     collection = db["qa_pairs"]
 
     try:
