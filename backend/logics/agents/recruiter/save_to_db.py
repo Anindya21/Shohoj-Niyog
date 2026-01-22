@@ -29,7 +29,7 @@ def save_qa_pairs_node(state: RecruiterGraphState)-> RecruiterGraphState:
             "qa_pairs": qa_pairs,
             "question_count": len(qa_pairs),
             "allowed_candidates": state["allowed_candidates"],
-            "created": datetime.now(timezone.utc),
+            "created": timezone.now(),
             "scheduled": state["scheduled"],
             "status": "pending" 
         }
@@ -43,4 +43,5 @@ def save_qa_pairs_node(state: RecruiterGraphState)-> RecruiterGraphState:
         "question_answer_pairs":qa_pairs,
         "interview_id": interview_id
     }
+
 
