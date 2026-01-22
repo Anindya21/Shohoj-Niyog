@@ -1,7 +1,8 @@
 import uuid
 import os
 from bson import ObjectId
-from datetime import datetime,timezone
+from datetime import timedelta
+from django.utils import timezone
 from logics.db.mongo import get_db_handle
 from logics.graph.schema import RecruiterGraphState
 
