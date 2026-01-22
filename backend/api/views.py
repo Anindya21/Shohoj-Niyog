@@ -137,14 +137,15 @@ def delete_session(request, session_id):
         return Response({"message": "Unauthorized Action"}, status=status.HTTP_403_FORBIDDEN)
     
     db, _ = get_db_handle("interview_db")
-    collection = db["qa_pairs"]
+    sess_collection = db["qa_pairs"]
+    resp_collection = db["user_db"]
 
     try:
         oid = to_object_id(session_id)
-        session = collection.find_one({'_id': oid})
+        session = sess_collection.find_one({'_id': oid})
     
     except InvalidId:
-        session = collection.find_one({'_id': session_id})
+        session = sess_collection.find_one({'_id': session_id})
 
 
     if session is None:
@@ -153,7 +154,9 @@ def delete_session(request, session_id):
     if session['created_by'] != str(user.id):
         return Response({"message": "You do not have permission to delete this session."}, status=status.HTTP_403_FORBIDDEN)
     
-    collection.delete_one({'_id': session['_id']})
+    sess_collection.delete_one({'_id': session['_id']})
+
+    resp_collection.delete_many({'session_id': session['_id']})
 
     return Response({"message": "Session deleted successfully."}, status=status.HTTP_200_OK)
 
