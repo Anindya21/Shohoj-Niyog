@@ -158,6 +158,21 @@ def login_user(request):
             "created_sessions": len(sessions_with_email)
         }, status=status.HTTP_200_OK)
     
+@api_view(['PATCH'])
+def forgot_password(request):
+    email = request.data.get("email")
+    new_password = request.data.get("new_password")
+
+    try:
+        user = CustomUser.objects.get(email=email)
+        user.set_password(new_password)
+        user.save()
+        return Response({"message": "Password updated successfully."}, status=status.HTTP_200_OK)
+    
+    except CustomUser.DoesNotExist:
+        return Response({"error": "User with this email does not exist."}, status=status.HTTP_404_NOT_FOUND)
+    
+    
 
     
 
