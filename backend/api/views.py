@@ -241,7 +241,7 @@ def user_response(request):
     user_mail = user.email
     session_id = request.data.get("session_id")
     user_name = user.get_full_name() or user.username
-
+    
     if not session_id:
         return Response({"error": "session_id is required."}, status=status.HTTP_400_BAD_REQUEST)
     
