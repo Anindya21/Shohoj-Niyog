@@ -57,7 +57,7 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
     level = request.data.get('level')
     allowed_candidates = request.data.get('allowed_candidates')
     num_questions= request.data.get('num_questions')
-    scheduled= request.data.get('scheduled', timezone.now().isoformat())
+    scheduled= request.data.get('scheduled', timezone.now())
     company=user.company
     
     if not position or not stacks or not level or not allowed_candidates:
@@ -193,8 +193,10 @@ def get_single_question(request, session_id):   ## To Display Single Question an
          
         qa_pairs = docs.get("qa_pairs", [])
 
-        serializer = MongoQuestionSerializer(qa_pairs, many=True)
+##
 
+
+        serializer = MongoQuestionSerializer(qa_pairs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
