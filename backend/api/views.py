@@ -19,6 +19,7 @@ from functools import lru_cache
 
 from django.utils.dateparse import parse_datetime
 from logics.utils.tasks import run_candidate_graph
+from datetime import timedelta
 
 load_env()
 
@@ -206,13 +207,22 @@ def get_single_question(request, session_id):   ## To Display Single Question an
         if not docs:
             return Response({"error": "Document not found"}, status=status.HTTP_404_NOT_FOUND)
          
-        qa_pairs = docs.get("qa_pairs", [])
+        current_time = timezone.now()
+        scheduled_time = docs.get("scheduled")
 
-##
+        if current_time < scheduled_time:
+            delta = scheduled_time - current_time
 
+            hours, remainder = divmod(int(delta.total_seconds()), 3600)
+            return Response({"message": f"{hours} Hours to start the interview"}, status=status.HTTP_403_FORBIDDEN)
 
-        serializer = MongoQuestionSerializer(qa_pairs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        elif current_time > scheduled_time + timedelta(minutes=3):
+            return Response({"message": "The interview session has expired."}, status=status.HTTP_403_FORBIDDEN)
+        
+        else:
+            qa_pairs = docs.get("qa_pairs", [])
+            serializer = MongoQuestionSerializer(qa_pairs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
