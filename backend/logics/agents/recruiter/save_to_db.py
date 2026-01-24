@@ -5,6 +5,7 @@ from datetime import timedelta
 from django.utils import timezone
 from logics.db.mongo import get_db_handle
 from logics.graph.schema import RecruiterGraphState
+from django.utils.dateparse import parse_datetime
 
 
 def save_qa_pairs_node(state: RecruiterGraphState)-> RecruiterGraphState:
@@ -31,7 +32,7 @@ def save_qa_pairs_node(state: RecruiterGraphState)-> RecruiterGraphState:
             "question_count": len(qa_pairs),
             "allowed_candidates": state["allowed_candidates"],
             "created": timezone.now(),
-            "scheduled": state["scheduled"],
+            "scheduled": parse_datetime(state["scheduled"]),
             "status": "pending" 
         }
         
