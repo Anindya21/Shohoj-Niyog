@@ -1,6 +1,6 @@
 ##graph/schema.py
 from typing import TypedDict, List, Optional, Any, Union
-
+from datetime import datetime
 class RecruiterGraphState(TypedDict):
     position: str
     stacks: List[str]
@@ -10,7 +10,7 @@ class RecruiterGraphState(TypedDict):
     interview_id: Optional[str]
     allowed_candidates: List[str]
     created_by: str
-    scheduled: str
+    scheduled: datetime
     company: str
 
 class CandidateGraphState(TypedDict):

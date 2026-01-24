@@ -17,7 +17,7 @@ import os, uuid, logging, mimetypes, tempfile
 from rest_framework import status
 from functools import lru_cache
 
-
+from django.utils.dateparse import parse_datetime
 from logics.utils.tasks import run_candidate_graph
 
 load_env()
@@ -57,8 +57,23 @@ def generate_interview_session(request):  # Endpoint to Generate QA And Intervie
     level = request.data.get('level')
     allowed_candidates = request.data.get('allowed_candidates')
     num_questions= request.data.get('num_questions')
-    scheduled= request.data.get('scheduled', timezone.now())
+    raw_scheduled = request.data.get("scheduled")
     company=user.company
+
+    if not raw_scheduled:
+        return Response(
+        {"error": "scheduled is required"},
+        status=400
+        )
+
+    scheduled = parse_datetime(raw_scheduled)
+
+    if scheduled is None:
+        return Response(
+        {"error": "Invalid datetime format"},
+        status=400
+    )
+    
     
     if not position or not stacks or not level or not allowed_candidates:
         return Response({"error": "position, stacks, level, and allowed_candidates are required."}, status=400)
