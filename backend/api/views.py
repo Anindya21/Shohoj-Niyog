@@ -223,6 +223,8 @@ def get_single_question(request, session_id):   ## To Display Single Question an
             qa_pairs = docs.get("qa_pairs", [])
             serializer = MongoQuestionSerializer(qa_pairs, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
+            # status
+# status: pending, ongoing, completed
 
 
 @api_view(['POST'])

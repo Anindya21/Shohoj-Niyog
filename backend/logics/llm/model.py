@@ -17,7 +17,7 @@ def load_llm():
 
   url="https://openrouter.ai/api/v1/chat/completions"
 
-  model= "meta-llama/llama-3.3-70b-instruct:free"
+  model= "qwen/qwen3-vl-30b-a3b-thinking"
   
   
   def invoke(prompt: str):
